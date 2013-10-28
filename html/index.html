@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" type="text/css" href="../css/style.css">
+<link rel="stylesheet" type="text/css" href="../3rdparty/leaflet/leaflet.css">
+
+<script type="text/javascript" src="../3rdparty/jquery/jquery-2.0.3.min.js"></script>
+
+<script type="text/javascript" src="../3rdparty/ros/eventemitter2.min.js"></script>
+<script type="text/javascript" src="../3rdparty/ros/mjpegcanvas.min.js"></script>
+<script type="text/javascript" src="../3rdparty/ros/roslib.js"></script>
+
+<script type="text/javascript" src="../3rdparty/leaflet/leaflet.js"></script>
+
+<script type="text/javascript" src="../js/drones/ardrone2.js"></script>
+<script type="text/javascript" src="../js/worker_comm.js"></script>
+<script type="text/javascript" src="../js/cloudrone.js"></script>
+<script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/onready.js"></script>
+
+<meta charset="UTF-8">
+
+<title>CloudDrone</title>
+</head>
+
+<body>
+<div id="wrapper">
+  <div id="header">
+    <div id="headerMain" style="display:none">
+      <div class="headerLinks">
+	<ul class="headerLinks">
+	  <li id="lMain"><a href="#">Главная</a></li>
+	  <li id="lAbout"><a href="#">О проекте</a></li>
+	  <li id="lRegister"><a href="#">Регистрация</a></li>
+	  <li id="lSelectDroneMain" style="display:none"><a href="#">Управление БИТС</a></li>
+	</ul>
+      </div>
+    </div>
+  <div id="headerSelectDrone" style="display:none">
+    <h2>Выбор БИТС</h2>
+      <div class="headerRadio">
+	<ul class="headerRadio">
+	  <input type="radio" name="showDrones" value="showDronesUser" id="showDronesUser" /> Показывать ваши
+	  <input type="radio" name="showDrones" value="showDronesFree" id="showDronesFree" /> Показывать свободные
+	  <input type="radio" name="showDrones" value="showDronesAll" id="showDronesAll" checked /> Показывать все
+	</ul>
+      </div>
+    </div>
+  <div id="headerFlightTask" style="display:none">
+    <div class="droneHeaderLinks">
+      <ul class="droneHeaderLinks">
+	<li id="lSelectDroneFlightTask"><a href="#">Выбор БИТС</a></li>::
+	<li id="lFlightTask"><a href="#"><b>Полетное задание</b></a></li>::
+	<li id="lMonitoringFlightTask"><a href="#">Мониторинг задания</a></li>::
+	<li id="lResultFlightTask"><a href="#">Результаты</a></li>
+      </ul>
+      <table>
+	<tr>
+	  <td>
+	    <h3>Полетное задание</h3>
+	  </td>
+	  <td>
+    <input type="file" id="bFlightTaskInput" accept="text/xml,application/xml"/>
+  </td>
+	</tr>
+      </table>
+    </div>
+  </div>
+  <div id="headerMonitoring" style="display:none">
+    <div class="droneHeaderLinks">
+      <ul class="droneHeaderLinks">
+	<li id="lSelectDroneMonitoring"><a href="#">Выбор БИТС</a></li>::
+	<li id="lFlightTaskMonitoring"><a href="#">Полетное задание</a></li>::
+	<li id="lMonitoring"><a href="#"><b>Мониторинг задания</b></a></li>::
+	<li id="lResultMonitoring"><a href="#">Результаты</a></li>
+      </ul>
+      <h3>Мониторинг выполнения задания</h3>
+    </div>
+  </div>
+  <div id="headerResult" style="display:none">
+    <div class="droneHeaderLinks">
+      <ul class="droneHeaderLinks">
+	<li id="lSelectDroneResult"><a href="#">Выбор БИТС</a></li>::
+	<li id="lFlightTaskResult"><a href="#">Полетное задание</a></li>::
+	<li id="lMonitoringResult"><a href="#">Мониторинг задания</a></li>::
+	<li id="lResult"><a href="#"><b>Результаты</b></a></li>
+      </ul>
+      <h3>Результаты выполнения задания</h3>
+      </div>
+    </div>
+  </div>
+  <div id="content">
+    <div id="contentMain" style="display:none">
+      <p>Вы находитесь на главной странице.</p>
+      <form id="sign" onsubmit="return CLOUDRONE.doSign();">
+	<p>Выполните вход, чтобы получить доступ к управлению БИТС.</p>
+	<table>
+	  <tr>
+	    <td>
+	      <label for="signId">Логин</label>
+	    </td>
+	    <td>
+	      <input type="text" id="signId" name="signId" />
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>
+	      <label for="signPassword">Пароль</label>
+	    </td>
+	    <td>
+	      <input type="password" id="signPassword" name="signPassword" />
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan="2">
+	      <input type="submit" id="signSubmit" value="Вход" />
+	    </td>
+	  </tr>
+	</table>
+      </form>
+      <div id="signState">
+      </div>
+    </div>
+    <div id="contentAbout" style="display:none">
+      Подробное описание проекта
+    </div>
+    <div id="contentRegister" style="display:none">
+      <p>Выполните регистрацию, чтобы получить доступ к управлению БИТС.</p>
+      <form id="register" onsubmit="return CLOUDRONE.doRegister();">
+	<table>
+	  <tr>
+	    <td>
+	      <label for="registerId">Логин</label>
+	    </td>
+	    <td>
+	      <input type="text" id="registerId" name="registerId" />
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>
+	      <label for="registerPassword">Пароль</label>
+	    </td>
+	    <td>
+	      <input type="password" id="registerPassword" name="registerPassword" />
+	    </td>
+	  </tr>
+	  <tr>
+	    <td colspan="2">
+	      <input type="submit" id="registerSubmit" value="Регистрация" />
+	    </td>
+	  </tr>
+	</table>
+      </form>
+      <div id="registerState">
+      </div>
+    </div>
+    <div id="contentSelectDrone" style="display:none">
+      <div id="selectDroneList" class="left">
+	<table class="selectDrone" id="droneTable">
+	</table>
+      </div>
+      <div id="selectDroneInfo" class="right">
+	Выберите БИТС в списке слева
+      </div>
+      <div class="clear">
+      </div>
+    </div>
+   <div id="contentFlightTask" style="display:none">
+      <div class="left">
+	<div id="taskMap">
+	</div>
+	<div id="genComList" style="display:none">
+	  Сгенерированный список команд
+	</div>
+      </div>
+      <fieldset class="right">
+	<legend><b>Маркеры</b></legend>
+	<div style="display:none">
+	  <button id="delMarker" onClick="onClickDelMarker();">
+	    Удалить
+	  </button>
+          <button id="addMarker" disabled="true">
+	    Добавить
+	  </button>
+	</div>
+	<table class="selectDrone" id="markers">
+	</table>
+      </div>
+      <div class="clear">
+      </div>
+    </div>
+    <div id="contentMonitoring" style="display:none">
+      <table>
+	<tr valign="top">
+	  <tr>
+	    <td>
+	    <div id="droneCamera">
+	    </div>
+	  </td>
+	  <td>
+	    <fieldset id="sensors">
+	    <legend><b>Показания датчиков</b></legend>
+	      <table id="sensorsInfo">
+	      </table>
+	    </fieldset>
+	    </td>
+	</tr>
+	<tr>
+	  <td>
+	    <div id="monitmap">
+      <div id="monitorMap" style="display:none">
+      <div id="monitorMap">
+	      </div>
+	    </div>
+	  </td>
+	  <td>
+      <div style="display:none">
+	<div>
+	      Лог:
+	      <br>...
+	      <br>...
+	      <br>...
+	    </div>
+	    <div class="clear">
+	    </div>
+	   </td>
+	</tr>
+      </table>
+  </div>
+  <div id="contentResult" style="display:none">
+    <div class="left">
+     <div id="resultMap" style="display:none">
+     </div>
+    </div>
+    <div class="markers">
+      <table id="markersInfo">
+      </table>
+    </div>
+    <div class="clear">
+    </div>
+  </div>
+  </div>
+  <div id="droneStateControl" style="display:none">
+    <table width="100%" id="dsctable">
+      <tr>
+	<td>
+	  <button id="bStart" onClick="CLOUDRONE.onClickStart();" disabled=false>
+	    Запустить
+	  </button>
+	  <button id="bStop" onClick="CLOUDRONE.onClickStop();" disabled=true style="display:none">
+	    Остановить
+	  </button>
+	</td>
+	<td>
+	  Статус:
+	  <div id="droneState">
+	    Ожидание полетного задания
+	  </div>
+	</td>
+	<td>
+	  Время выполнения задания
+	  <div id="elapsedTime">
+	    00:00:00
+	  </div>
+	</td>
+      </tr>
+    </table>
+  </div>
+  <div id="footer">
+    <div class="footerLinks">
+      <ul class="footerLinks">
+	<li><a href="#">Social Media Links</a></li>
+	<li><a href="#">Privacy Policy</a></li>
+	<li><a href="#">Terms of Use</a></li>
+	<li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+</body>
+
+</html>
