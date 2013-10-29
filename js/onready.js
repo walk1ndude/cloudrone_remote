@@ -20,10 +20,21 @@ $(document).ready(function() {
 
   CLOUDRONE.map = L.map('taskMap').setView([0, 0], 0);
   
-  $("window").bind("unload", function(eventObject) {
+  $('window').bind('unload', function(eventObject) {
       alert('here');
       return true;
     });
+  
+  $('#lSignOff').on('click', function() {
+    WORKER_COMM.doSign({
+      user : {
+	id : localStorage.id
+      },
+      isPageUpdate : false
+    }, CLOUDRONE.templates.sign);
+    $('#contentMain').html('Выход выполнен успешно');
+    PAGE.showPage('Main');
+  });
   
   $('#bFlightTaskInput').change(function(eventObject) {
     CLOUDRONE.loadFlightTask(eventObject);

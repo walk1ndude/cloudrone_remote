@@ -49,6 +49,11 @@ var CLOUDRONE = {
 	  {
 	    element : '#lSelectDroneMain',
 	    method : 'show'
+	  },
+	  {
+	    element : '#signState',
+	    method : 'html',
+	    params : ['']
 	  }
 	]
       },
