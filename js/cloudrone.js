@@ -309,7 +309,8 @@ var CLOUDRONE = {
 	user : {
 	  id : $('#signId').val(),
 	  password : $('#signPassword').val()
-	}
+	},
+	isPageUpdate : false
      },
       this.templates.sign);
   },

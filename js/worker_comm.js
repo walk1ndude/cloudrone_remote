@@ -103,7 +103,8 @@ var WORKER_COMM = {
 	user : {
 	  id : input.user.id,
 	  password : input.user.password || ''
-	}
+	},
+	isPageUpdate : input.isPageUpdate
      },
       responseSuccess : template.success,
       responseFailure : template.failure

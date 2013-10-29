@@ -14,7 +14,8 @@ $(document).ready(function() {
   WORKER_COMM.doSign({
       user : {
 	id : localStorage.id
-      }
+      },
+      isPageUpdate : true
   }, CLOUDRONE.templates.sign);
 
   CLOUDRONE.map = L.map('taskMap').setView([0, 0], 0);
