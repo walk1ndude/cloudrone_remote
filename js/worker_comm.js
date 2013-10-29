@@ -33,6 +33,23 @@ var WORKER_COMM = {
   
   serviceResponse : function(response, template) {
     switch (template.id) {
+      
+      case 'sign_success' :
+	var wasSigned = (localStorage,id !== '');
+	localStorage.id = response.id;
+	
+	if (wasSigned && response.id === '') {
+	  $('#lSignOff').hide();
+	}
+	else {
+	  $('#lSignOff').show();
+	}
+	break;
+	
+      case 'sign_failure' :
+	localStorage.id = '';
+	break;
+      
       case 'drone_show_success' :
 	CLOUDRONE.unselectDrone();
 	CLOUDRONE.showDrones(response);
@@ -84,8 +101,6 @@ var WORKER_COMM = {
       
       $(domElem)[method](params);
     }
-    
-    localStorage.id = (template.id == 'sign_success') ? response.id : localStorage.id;
     
     for (var id = 0; id < ((template.alerts) ? template.alerts.length : 0) ; id ++) {
       alert(template.alerts[id]);

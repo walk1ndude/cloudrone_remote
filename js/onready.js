@@ -11,6 +11,13 @@ $(document).ready(function() {
     mjpegport : 12001
   }*/);
   
+  if (localStorage.id !== '') {
+    $('#lSignOff').show();
+  }
+  else {
+    $('#lSignOff').hide();
+  }
+  
   WORKER_COMM.doSign({
       user : {
 	id : localStorage.id
@@ -34,6 +41,7 @@ $(document).ready(function() {
     }, CLOUDRONE.templates.sign);
     $('#contentMain').html('Выход выполнен успешно');
     PAGE.showPage('Main');
+    $('#lSignOff').hide();
   });
   
   $('#bFlightTaskInput').change(function(eventObject) {
