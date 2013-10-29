@@ -2,14 +2,14 @@ var WORKER_COMM = {
   
   roshostname : 'localhost',
   mjpeghostname : 'localhost',
-  rosport : 9090,
+  rosport : 8080,
   mjpegport : 8081,
   
   initRos: function(routes) {
-    this.roshostname = routes.roshostname || this.roshostname;
-    this.rosport = routes.rosport || this.rosport;
-    this.mjpeghostname = routes.mjpeghostname || this.mjpeghostname;
-    this.mjpegport = routes.mjpegport || this.mjpegport;
+    this.roshostname = ((routes) ? routes.roshostname : this.roshostname) || this.roshostname;
+    this.rosport = ((routes) ? routes.rosport : this.rosport) || this.rosport;
+    this.mjpeghostname = ((routes) ? routes.mjpeghostname : this.mjpeghostname) || this.mjpeghostname;
+    this.mjpegport = ((routes) ? routes.mjpegport : this.mjpegport) || this.mjpegport;
     
     this.ros = new ROSLIB.Ros({
       url : 'ws://' + this.roshostname + ':' + this.rosport
