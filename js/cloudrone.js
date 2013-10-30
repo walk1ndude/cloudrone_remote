@@ -262,6 +262,9 @@ var CLOUDRONE = {
       case CLOUDRONE.STATES['OnTask'] :
 	PAGE.showPage('Monitoring');
 	break;
+      case CLOUDRONE.STATES['TaskCompleted'] :
+	PAGE.showPage('Result');
+	break;
     }
     CLOUDRONE.map.invalidateSize(false);
   },
