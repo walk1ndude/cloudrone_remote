@@ -34,6 +34,7 @@ var WORKER_COMM = {
 	    case 255 :
 	      localStorage.id = '';
 	      PAGE.showPage('Main');
+	      WORKER_COMM.serviceResponse(response, initParams.responseFailure);
 	      break;
 	      
 	    default :

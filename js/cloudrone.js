@@ -260,13 +260,35 @@ var CLOUDRONE = {
 	});
 	break;
       case CLOUDRONE.STATES['OnTask'] :
-	PAGE.showPage('Monitoring');
+	WORKER_COMM.initMonitoring(id);
 	break;
       case CLOUDRONE.STATES['TaskCompleted'] :
-	PAGE.showPage('Result');
+	CLOUDRONE.showResults(id);
 	break;
     }
     CLOUDRONE.map.invalidateSize(false);
+  },
+  
+  showResults : function(id) {
+    PAGE.showPage('Result');
+    $('#droneState').html(CLOUDRONE.WRITESTATES['OnComplete']);
+    CLOUDRONE.stopTheClocks(CLOUDRONE.clocks);
+    CLOUDRONE.setButtons({
+      toEnable : ['#bStart'],
+      toDisable : ['#bStop']
+    });
+
+    if(CLOUDRONE.drones[id].name=='TestDroneDist')  
+      $('#distInfo').load('dist/TestDroneDist.html');
+    
+    if(CLOUDRONE.drones[id].name=='TestDroneMaxDist')  
+      $('#distInfo').load('dist/TestDroneMaxDist.html');
+      
+    if(CLOUDRONE.drones[id].name=='TestDroneMinDist')  
+      $('#distInfo').load('dist/TestDroneMinDist.html');
+      
+    if(CLOUDRONE.drones[id].name=='TestDroneDist2')  
+      $('#distInfo').load('dist/TestDroneDist2.html');
   },
   
   getState : function(id) {
@@ -274,35 +296,19 @@ var CLOUDRONE = {
   },
   
   setState : function(id, nstate) {
-    if (nstate == CLOUDRONE.STATES['TaskCompleted']) {
-      PAGE.showPage('Result');
-      $('#droneState').html(CLOUDRONE.WRITESTATES['OnComplete']);
-      CLOUDRONE.stopTheClocks(CLOUDRONE.clocks);
-      CLOUDRONE.setButtons({
-	toEnable : ['#bStart'],
-	toDisable : ['#bStop']
-      });
-
-      if(CLOUDRONE.drones[id].name=='TestDroneDist')  
-	$('#distInfo').load('dist/TestDroneDist.html');
-      
-      if(CLOUDRONE.drones[id].name=='TestDroneMaxDist')  
-	$('#distInfo').load('dist/TestDroneMaxDist.html');
-       
-      if(CLOUDRONE.drones[id].name=='TestDroneMinDist')  
-	$('#distInfo').load('dist/TestDroneMinDist.html');
-       
-      if(CLOUDRONE.drones[id].name=='TestDroneDist2')  
-	$('#distInfo').load('dist/TestDroneDist2.html');
-    }
-    else if (nstate == CLOUDRONE.STATES['OnTask']) {
-      CLOUDRONE.initFlightCommands(CLOUDRONE.pickedDrone);
-    }
+    switch (nstate) {
+      case CLOUDRONE.STATES['TaskCompleted'] :
+	CLOUDRONE.showResults(id);
+	break;
+      case CLOUDRONE.STATES['OnTask'] :
+	CLOUDRONE.initFlightCommands(id);
+	break;
+    };
     
     CLOUDRONE.setUser(id, CLOUDRONE.drones[id].state, nstate);
     CLOUDRONE.drones[id].state = nstate;
   },
-  
+
   setUser : function(id, cstate, nstate) {
     if (cstate == CLOUDRONE.STATES['Free'] && nstate == CLOUDRONE.STATES['Selected']) {
       CLOUDRONE.drones[id].user = localStorage.id;
@@ -333,8 +339,7 @@ var CLOUDRONE = {
       this.templates.reg);
   },
   
-  fetchMaps : function(id) { 
-    
+  fetchMaps : function(id) {
      CLOUDRONE.map.remove();
      //CLOUDRONE.map.layers=[];
      
@@ -354,7 +359,6 @@ var CLOUDRONE = {
      });
   },
 
-  
   onClickStart : function() {
     counter=0;
     var pickedDrone = CLOUDRONE.pickedDrone;
