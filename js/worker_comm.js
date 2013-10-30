@@ -25,7 +25,21 @@ var WORKER_COMM = {
 	  WORKER_COMM.serviceResponse(response, initParams.responseSuccess);
 	}
 	else {
-	  WORKER_COMM.serviceResponse(response, initParams.responseFailure);
+	  switch (response.error) {
+	    case 254 :
+	      localStorage.id = response.id;
+	      PAGE.showPage('Main');
+	      break;
+	      
+	    case 255 :
+	      localStorage.id = '';
+	      PAGE.showPage('Main');
+	      break;
+	      
+	    default :
+	      WORKER_COMM.serviceResponse(response, initParams.responseFailure);
+	      break;
+	  }
 	}
       }
     );
