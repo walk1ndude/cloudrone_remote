@@ -335,10 +335,20 @@ var CLOUDRONE = {
      CLOUDRONE.map.remove();
      //CLOUDRONE.map.layers=[];
      
-     CLOUDRONE.map = L.map('taskMap').setView([0, 0], 0);
-     L.tileLayer('../tiles_/'+'qwe'+id+'/{z}/{x}/{y}.png', {maxZoom: 2,noWrap:true}).addTo(CLOUDRONE.map);
-     CLOUDRONE.map.markers = [];
-    
+     $.ajax({
+        url: '../tiles_/'+'qwe'+id+'/map.txt',             // указываем URL и
+        dataType : "text",                     // тип загружаемых данных
+        success: function (data, textStatus) { // вешаем свой обработчик на функцию success
+           var map_info = jQuery.parseJSON(data);
+           CLOUDRONE.map_info = map_info;
+           CLOUDRONE.map = L.map('taskMap').setView([0, 0], 0);
+           L.tileLayer('../tiles_/'+'qwe'+id+'/{z}/{x}/{y}.png', {maxZoom: map_info.maxZoom, noWrap:true}).addTo(CLOUDRONE.map);
+           CLOUDRONE.map.markers = [];
+        },
+        error: function (xhr, status, error) {
+           alert("Can not load map info: " + error);
+        }
+     });
   },
 
   
@@ -532,14 +542,16 @@ var CLOUDRONE = {
 	      if (flightCmds[c].match(patt)) { // if goto numbers
 		var numbers = flightCmds[c].trim().split(" ");
 		
-		for (var j = 1; j <= 2; j++) {
-		  numbers[j] *= CLOUDRONE.KOSTILEV;
-		  while (numbers[j] < 0) numbers[j] += 360.;
-		  while (numbers[j] > 360) numbers[j] -= 360.;
-		}
-		
-		CLOUDRONE.map.markers[markerId ++] = L.marker([numbers[1], numbers[2]]).addTo(CLOUDRONE.map);
+		if (CLOUDRONE.map_info)
+		{
+		  for (var j = 1; j <= 2; j++) {
+		    numbers[j] = (parseFloat(numbers[j]) + CLOUDRONE.map_info.zero[j-1]) / CLOUDRONE.map_info.size * 360.0;
+		    while (numbers[j] < -180) numbers[j] += 360.;
+		    while (numbers[j] > 180) numbers[j] -= 360.;
+		  }
+		  CLOUDRONE.map.markers[markerId ++] = L.marker([numbers[2], numbers[1]]).addTo(CLOUDRONE.map);
 		//CLOUDRONE.maps.taskMap.markers[markerId ++] = L.marker([numbers[3]*CLOUDRONE.KOSTILEV, //numbers[4]*CLOUDRONE.KOSTILEV]).addTo(CLOUDRONE.maps.taskMap);
+		}
 	      }
 	      
 	      CLOUDRONE.drones[CLOUDRONE.pickedDrone].cmds.push("c " + flightCmds[c]);
