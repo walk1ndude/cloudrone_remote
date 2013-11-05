@@ -33,7 +33,7 @@ var WORKER_COMM = {
 	      
 	    case 255 :
 	      localStorage.id = '';
-	      PAGE.showPage('Main');
+	      $('#lSignOffMain').trigger('click');
 	      break;
 	      
 	    default :

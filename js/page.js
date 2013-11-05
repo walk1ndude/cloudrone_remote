@@ -230,18 +230,20 @@ var PAGE = {
 
     for(var i in where) {
         $('#lSignOff' + where[i]).on('click', function() {
-            WORKER_COMM.doSign({
-                user : {
-                    id : localStorage.id
-                },
-                isPageUpdate : false
-            }, CLOUDRONE.templates.sign);
-            $('#signState').html('Выход выполнен успешно');
-            PAGE.showPage('Main');
-            $('#lSignOffMain').hide();
-            $('#lSelectDroneMain').hide();
-	    $('#lRegister').show();
-	    $('#lSignOnMain').show();
+          if (localStorage.id !== '') {
+	    WORKER_COMM.doSign({
+		  user : {
+		      id : localStorage.id
+		  },
+		  isPageUpdate : false
+	      }, CLOUDRONE.templates.sign);
+	  }
+	  $('#signState').html('Выход выполнен успешно');
+	  PAGE.showPage('Main');
+	  $('#lSignOffMain').hide();
+	  $('#lSelectDroneMain').hide();
+	  $('#lRegister').show();
+	  $('#lSignOnMain').show();
         });
     }
 
