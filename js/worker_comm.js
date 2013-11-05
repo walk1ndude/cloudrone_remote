@@ -69,6 +69,7 @@ var WORKER_COMM = {
 	CLOUDRONE.setButtons({
 	  toEnable : ['#bFligthTaskInput'],
 	});
+	CLOUDRONE.showDroneName();
 	break;
 	
       case 'task_start_success' :

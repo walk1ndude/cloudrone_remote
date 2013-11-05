@@ -232,6 +232,14 @@ var CLOUDRONE = {
     $('#selectDroneInfo').empty();
   },
   
+  showDroneName : function() {
+    var pages = ['FlightTask', 'Monitoring', 'Result'];
+    
+    for(var i in pages) {
+      $('#lDroneName' + pages[i]).hmtl('Выбран БИТС: <b>' + CLOUDRONE.drones[CLOUDRONE.pickedDrone].name + '</b>');
+    }
+  },
+  
   pickDrone : function(id) {
       /**/
     $('#markers').empty();
