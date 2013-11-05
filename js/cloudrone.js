@@ -51,6 +51,14 @@ var CLOUDRONE = {
 	    method : 'show'
 	  },
 	  {
+	    element : '#lRegister',
+	    method : 'hide'
+	  },
+	  {
+	    element : '#lSignOnMain',
+	    method : 'hide'
+	  },
+	  {
 	    element : '#signState',
 	    method : 'html',
 	    params : ['']
@@ -74,7 +82,7 @@ var CLOUDRONE = {
 	id : 'reg_success',
 	domElements : [
 	  {
-	    element : '#register',
+	    element : '#lRegister',
 	    method : 'hide'
 	  },
 	  {

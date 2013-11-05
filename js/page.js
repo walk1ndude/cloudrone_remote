@@ -3,15 +3,13 @@ var PAGE = {
   cpage : '',
   
   showPage : function(npage) {
-    var cpage
-  
-    if (!!this.cpage) {
-      this.pages[this.cpage].header.hide();
-      this.pages[this.cpage].content.hide();
+    if (!!PAGE.cpage) {
+      PAGE.pages[this.cpage].header.hide();
+      PAGE.pages[this.cpage].content.hide();
     }
     
-    this.pages[npage].header.show();
-    this.pages[npage].content.show();
+    PAGE.pages[npage].header.show();
+    PAGE.pages[npage].content.show();
     
     if (npage == 'FlightTask' || npage == 'Monitoring' || npage == 'Result') {
       $('#droneStateControl').show();
@@ -210,6 +208,34 @@ var PAGE = {
       });
     }());
     
+    $('#lSignOnMain').on('click', function() {
+      $('#sign').each(function() {
+	this.reset();
+      });
+      
+      $('#sign').show();
+      $('#signState').html('');
+    });
+
+    var where = ['Main', 'FlightTask', 'Monitoring', 'Result'];
+
+    for(var i in where) {
+        $('#lSignOff' + where[i]).on('click', function() {
+            WORKER_COMM.doSign({
+                user : {
+                    id : localStorage.id
+                },
+                isPageUpdate : false
+            }, CLOUDRONE.templates.sign);
+            $('#signState').html('Выход выполнен успешно');
+            PAGE.showPage('Main');
+            $('#lSignOffMain').hide();
+            $('#lSelectDroneMain').hide();
+	    $('#lRegister').show();
+	    $('#lSignOnMain').show();
+        });
+    }
+
     this.showPage('Main');
   },
   

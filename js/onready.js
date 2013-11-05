@@ -31,19 +31,7 @@ $(document).ready(function() {
       alert('here');
       return true;
     });
-  
-  $('#lSignOff').on('click', function() {
-    WORKER_COMM.doSign({
-      user : {
-	id : localStorage.id
-      },
-      isPageUpdate : false
-    }, CLOUDRONE.templates.sign);
-    $('#contentMain').html('Выход выполнен успешно');
-    PAGE.showPage('Main');
-    $('#lSignOff').hide();
-  });
-  
+
   $('#bFlightTaskInput').change(function(eventObject) {
     CLOUDRONE.loadFlightTask(eventObject);
   });

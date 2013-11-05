@@ -34,7 +34,6 @@ var WORKER_COMM = {
 	    case 255 :
 	      localStorage.id = '';
 	      PAGE.showPage('Main');
-	      WORKER_COMM.serviceResponse(response, initParams.responseFailure);
 	      break;
 	      
 	    default :
@@ -54,10 +53,10 @@ var WORKER_COMM = {
 	localStorage.id = response.id;
 	
 	if (wasSigned && response.id === '') {
-	  $('#lSignOff').hide();
+	  $('#lSignOffMain').hide();
 	}
 	else {
-	  $('#lSignOff').show();
+	  $('#lSignOffMain').show();
 	}
 	break;
 	
@@ -140,7 +139,7 @@ var WORKER_COMM = {
       responseFailure : template.failure
     });
     
-    return false;
+    return true;
   },
   
   doRegister : function(input, template) {
@@ -155,7 +154,7 @@ var WORKER_COMM = {
       responseFailure : template.failure
     });
     
-    return false;
+    return true;
   },
   
   doShowDrones : function(input, template) {
