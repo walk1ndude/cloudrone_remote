@@ -242,6 +242,7 @@ var PAGE = {
 	  PAGE.showPage('Main');
 	  $('#lSignOffMain').hide();
 	  $('#lSelectDroneMain').hide();
+	  $('#lUserNameMain').hide();
 	  $('#lRegister').show();
 	  $('#lSignOnMain').show();
         });

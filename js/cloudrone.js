@@ -325,7 +325,17 @@ var CLOUDRONE = {
       CLOUDRONE.drones[id].user = '';
     }
   },
- 
+  
+  showUserName : function() {
+    
+    var pages = ['Main', 'FlightTask', 'Monitoring', 'Result'];
+    
+    for(var i in pages) {
+      $('#lUserName' + pages[i]).html('Вы вошли как: <b>' + localStorage.id + '</b>');
+      $('#lUserName' + pages[i]).show();
+    }
+  },
+  
   doSign : function() {
     return WORKER_COMM.doSign({
 	user : {

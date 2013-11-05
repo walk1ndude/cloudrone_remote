@@ -29,6 +29,7 @@ var WORKER_COMM = {
 	    case 254 :
 	      localStorage.id = response.id;
 	      PAGE.showPage('Main');
+	      CLOUDRONE.showUserName();
 	      break;
 	      
 	    case 255 :
@@ -49,15 +50,9 @@ var WORKER_COMM = {
     switch (template.id) {
       
       case 'sign_success' :
-	var wasSigned = (localStorage,id !== '');
 	localStorage.id = response.id;
-	
-	if (wasSigned && response.id === '') {
-	  $('#lSignOffMain').hide();
-	}
-	else {
-	  $('#lSignOffMain').show();
-	}
+	$('#lSignOffMain').show();
+	CLOUDRONE.showUserName();
 	break;
 	
       case 'sign_failure' :
