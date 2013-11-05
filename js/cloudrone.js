@@ -236,7 +236,7 @@ var CLOUDRONE = {
     var pages = ['FlightTask', 'Monitoring', 'Result'];
     
     for(var i in pages) {
-      $('#lDroneName' + pages[i]).hmtl('Выбран БИТС: <b>' + CLOUDRONE.drones[CLOUDRONE.pickedDrone].name + '</b>');
+      $('#lDroneName' + pages[i]).html('Выбран БИТС: <b>' + CLOUDRONE.drones[CLOUDRONE.pickedDrone].name + '</b>');
     }
   },
   
