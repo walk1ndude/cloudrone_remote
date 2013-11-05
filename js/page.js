@@ -216,6 +216,15 @@ var PAGE = {
       $('#sign').show();
       $('#signState').html('');
     });
+    
+    $('#lRegister').on('click', function() {
+      $('#register').each(function() {
+	this.reset();
+      });
+      
+      $('#register').show();
+      $('#registerState').html('');
+    });
 
     var where = ['Main', 'FlightTask', 'Monitoring', 'Result'];
 
