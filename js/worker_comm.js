@@ -235,8 +235,6 @@ var WORKER_COMM = {
     });
     
     var video = model.video;
-   
-    $('#droneCamera').html("");
     
     this.viewer = new MJPEGCANVAS.Viewer({
         divID: 'droneCamera',
