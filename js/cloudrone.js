@@ -185,7 +185,7 @@ var CLOUDRONE = {
 	CLOUDRONE.showResults(id);
 	break;
       case CLOUDRONE.STATES['OnTask'] :
-	CLOUDRONE.initFlightCommands(id);
+	//CLOUDRONE.initFlightCommands(id);
 	$('#droneState').html(CLOUDRONE.WRITESTATES['OnTask']);
 	break;
     };
