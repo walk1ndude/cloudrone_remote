@@ -47,7 +47,7 @@ PAGE.domsToFetch = [
     domElements : [
       {
 	element : '#headerSelectDrone',
-	method : 'hide'
+	method : 'show'
       },
     ],
     page : 'SelectDrone',
@@ -93,7 +93,7 @@ PAGE.domsToFetch = [
     domElements : [
       {
 	element : '#headerSelectDrone',
-	method : 'hide'
+	method : 'show'
       },
     ],
     page : 'SelectDrone',
@@ -139,7 +139,7 @@ PAGE.domsToFetch = [
     domElements : [
       {
 	element : '#headerSelectDrone',
-	method : 'hide'
+	method : 'show'
       },
     ],
     page : 'SelectDrone',

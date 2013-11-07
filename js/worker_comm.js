@@ -75,18 +75,12 @@ var WORKER_COMM = {
 	break;
 	
       case 'drone_user_free_success' :
-	this.doShowDrones({
-	  policy : CLOUDRONE.SHOWPOLICY.SHOW_ALL,
-	},
-	CLOUDRONE.templates.drone_show);
+	CLOUDRONE.doShowDrones();
 	break;
 	
       case 'task_stop_success' :
 	CLOUDRONE.setState(response.state.id, response.state.state); 
-	this.doShowDrones({
-	  policy : CLOUDRONE.SHOWPOLICY.SHOW_ALL,
-	},
-	CLOUDRONE.templates.drone_show);
+	CLOUDRONE.doShowDrones();
 	break;
     };
 

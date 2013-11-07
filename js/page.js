@@ -68,7 +68,7 @@ var PAGE = {
 
       for (var i in page) {
 	this.pages[page[i]] = {
-	  'header' : $('#header' + ($.inArray(page[i], PAGE.maintenancePages != -1) ? PAGE.mainPage : page[i])),
+	  'header' : $('#header' + (($.inArray(page[i], PAGE.maintenancePages) != -1) ? PAGE.mainPage : page[i])),
 	  'content' : $('#content' + page[i])
 	}
       }
@@ -87,10 +87,7 @@ var PAGE = {
 	
 	if (flags) {
 	  if (flags.showDrones) {
-	    WORKER_COMM.doShowDrones({
-	      policy : CLOUDRONE.SHOWPOLICY.SHOW_ALL
-	    },
-	    CLOUDRONE.templates.drone_show);
+	    CLOUDRONE.doShowDrones();
 	  }
 	  if (flags.showResults) {
 	    WORKER_COMM.initResults();
@@ -111,25 +108,8 @@ var PAGE = {
     
     function fetchRadioSelectDrones() {
       $('input:radio[name="showDrones"]').change(function() {
-	if ($(this).val() == 'showDronesAll') {
-	  WORKER_COMM.doShowDrones({
-	    policy : CLOUDRONE.SHOWPOLICY.SHOW_ALL
-	  },
-	  CLOUDRONE.templates.drone_show);
-	}
-	else if ($(this).val() == 'showDronesUser') {
-	  WORKER_COMM.doShowDrones({
-	    policy : CLOUDRONE.SHOWPOLICY.SHOW_USER,
-	    user : localStorage.id
-	  },
-	  CLOUDRONE.templates.drone_show);
-	}
-	else if ($(this).val() == 'showDronesFree') {
-	  WORKER_COMM.doShowDrones({
-	    policy : CLOUDRONE.SHOWPOLICY.SHOW_FREE,
-	  },
-	  CLOUDRONE.templates.drone_show);
-	}
+	CLOUDRONE.currentShowPolicy = $(this).val();
+	CLOUDRONE.doShowDrones();
       });
     };
     

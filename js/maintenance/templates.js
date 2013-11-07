@@ -41,7 +41,11 @@ CLOUDRONE.templates = {
 	{
 	  element : '#signState',
 	  method : 'html',
-	  params : ['Ошибка! Вход не выполнен.']
+	  params : ['Данный пользователь не зарегистрирован']
+	},
+	{
+	  element : '#sign',
+	  method : 'hide',
 	},
 	{
 	  element : '#headerSelectDrone',
@@ -158,7 +162,7 @@ CLOUDRONE.templates = {
   drone_pick : {
     success : {
       id : 'drone_pick_success',
-      pages : ['FlightTask'],
+      pages : 'FlightTask',
       domElements : [
 	{
 	  element : '#bFlightTaskInput',

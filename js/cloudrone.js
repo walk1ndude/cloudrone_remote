@@ -39,9 +39,10 @@ var CLOUDRONE = {
 	+ drone.location +'</td><td align="center">'
 	+ (isFree ? 'Свободен' : 'Занят') + '</td><td align="center"><button onClick="CLOUDRONE.pickDrone('
 	+ id + ');" ' + ((isOwned || isFree) ? '' : 'disabled')
-	+ '>Выбрать</button></td><td align="center"><button onClick="CLOUDRONE.stopTask('
+	+ '>Выбрать</button></td><td align="center"><button onClick="CLOUDRONE.freeDrone('
 	+ id + ');" ' + ((isOwned) ? '' : 'disabled')
-	+ '>Освободить</button></td></tr>');
+	+ ' style = "display:' + ((CLOUDRONE.currentShowPolicy == 'SHOW_FREE') ? 'none' : 'block')
+	+ '">Освободить</button></td></tr>');
     }
       
     if (response.refresh) {
@@ -49,7 +50,15 @@ var CLOUDRONE = {
     }
   },
   
-  stopTask : function(id) {
+  doShowDrones : function() {
+    WORKER_COMM.doShowDrones({
+      policy : CLOUDRONE.SHOWPOLICY[CLOUDRONE.currentShowPolicy],
+      user : localStorage.id,
+    },
+    CLOUDRONE.templates.drone_show);
+  },
+  
+  freeDrone : function(id) {
     WORKER_COMM.doSetState({
       state: {
 	id : id,
@@ -57,7 +66,7 @@ var CLOUDRONE = {
       },
       nstate : CLOUDRONE.STATES['Free'],
     },
-    CLOUDRONE.templates.task_stop);
+    CLOUDRONE.templates.drone_user_free);
   },
 
   selectDrone : function(id) {
@@ -84,7 +93,9 @@ var CLOUDRONE = {
   },
   
   showDroneName : function() {
-    for(var i in PAGE.dronePages) {
+    var pages = PAGE.dronePages;
+    
+    for(var i in pages) {
       $('#lDroneName' + pages[i]).html('Выбран БИТС: <b>' + CLOUDRONE.drones[CLOUDRONE.pickedDrone].name + '</b>');
     }
   },
@@ -164,6 +175,12 @@ var CLOUDRONE = {
   
   setState : function(id, nstate) {
     switch (nstate) {
+      case CLOUDRONE.STATES['Selected'] :
+	PAGE.showPage('FlightTask');
+	CLOUDRONE.setButtons({
+	  toEnable : ['#bFlightTaskInput']
+	});
+	break;
       case CLOUDRONE.STATES['TaskCompleted'] :
 	CLOUDRONE.showResults(id);
 	break;

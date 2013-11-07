@@ -49,9 +49,9 @@
       <h2>Выбор БИТС</h2>
 	<div class="headerRadio">
 	  <ul class="headerRadio">
-	    <input type="radio" name="showDrones" value="showDronesUser" id="showDronesUser" /> Показывать ваши
-	    <input type="radio" name="showDrones" value="showDronesFree" id="showDronesFree" /> Показывать свободные
-	    <input type="radio" name="showDrones" value="showDronesAll" id="showDronesAll" checked /> Показывать все
+	    <input type="radio" name="showDrones" value="SHOW_USER" id="showDronesUser" /> Показывать ваши
+	    <input type="radio" name="showDrones" value="SHOW_FREE" id="showDronesFree" /> Показывать свободные
+	    <input type="radio" name="showDrones" value="SHOW_ALL" id="showDronesAll" checked /> Показывать все
 	  </ul>
 	</div>
       </div>
@@ -110,7 +110,6 @@
   </div>
   <div id="content">
     <div id="contentMain" style="display:none">
-      <p>Вы находитесь на главной странице.</p>
       <form id="sign" onsubmit="return CLOUDRONE.doSign();">
 	<p>Выполните вход, чтобы получить доступ к управлению БИТС.</p>
 	<table>
