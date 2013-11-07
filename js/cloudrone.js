@@ -156,9 +156,12 @@ var CLOUDRONE = {
     
     if (CLOUDRONE.drones[id].name !== 'TestDroneObj') {
       $('#distInfo').load('dist/' + CLOUDRONE.drones[id].name + '.html');
+      $('#distResult').show();
+      $('#markersResult').hide();
     }
     else {
-      $('#distInfo').html('');
+      $('#distResult').hide();
+      $('#markersResult').show();
     }
   },
   
@@ -365,9 +368,9 @@ var CLOUDRONE = {
     
       if(this.counter == 10)
       {
-	var info = '<tr><td><div id="videoMarker">Обнаруженные маркеры:</td></tr>';
-      info += '<tr><td>' + "<img src='object/1.png'/>" + '</td><td>' + 'Класс1'+ '</td></tr>';
-      $('#markersInfo').append(info);
+	//var info = '<tr><td><div id="videoMarker">Обнаруженные маркеры:</td></tr>';
+	var info = '<tr><td>' + "<img src='object/1.png'/>" + '</td><td>' + 'Класс1'+ '</td></tr>';
+	$('#markersInfo').append(info);
       }
       
       
