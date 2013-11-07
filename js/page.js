@@ -8,6 +8,10 @@ var PAGE = {
       if (!!PAGE.cpage) {
 	PAGE.pages[this.cpage].header.hide();
 	PAGE.pages[this.cpage].content.hide();
+	
+	if (npage == 'Main' && localStorage.id === '') {
+	  $('#lSignOnMain').trigger('click');
+	}
       }
       
       PAGE.pages[npage].header.show();

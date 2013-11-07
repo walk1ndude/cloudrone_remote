@@ -110,6 +110,8 @@
   </div>
   <div id="content">
     <div id="contentMain" style="display:none">
+      <div id="signState">
+      </div>
       <form id="sign" onsubmit="return CLOUDRONE.doSign();">
 	<p>Выполните вход, чтобы получить доступ к управлению БИТС.</p>
 	<table>
@@ -136,14 +138,14 @@
 	  </tr>
 	</table>
       </form>
-      <div id="signState">
-      </div>
     </div>
     <div id="contentAbout" style="display:none">
       Подробное описание проекта
     </div>
     <div id="contentRegister" style="display:none">
       <p>Выполните регистрацию, чтобы получить доступ к управлению БИТС.</p>
+      <div id="registerState">
+      </div>
       <form id="register" onsubmit="return CLOUDRONE.doRegister();">
 	<table>
 	  <tr>
@@ -169,8 +171,6 @@
 	  </tr>
 	</table>
       </form>
-      <div id="registerState">
-      </div>
     </div>
     <div id="contentSelectDrone" style="display:none">
       <div id="selectDroneList" class="left">
