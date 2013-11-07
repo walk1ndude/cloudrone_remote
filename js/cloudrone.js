@@ -15,155 +15,6 @@ var CLOUDRONE = {
   
   drones : {},
   
-  STATES : {
-    'Free' : 0,
-    'Selected' : 1,
-    'OnTask' : 2,
-    'TaskCompleted' : 3,
-    'WaitTask' : 4,
-    'WaitNavdata' : 5, // special status (not present in db), for sending commands only on first navdata arrival
-  },
-  
-  WRITESTATES : {
-    'WaitTask' : 'ожидание полетного задания',
-    'WaitLaunch' : 'ожидание начала полетного задания',
-    'OnTask' : 'выполнение полетного задания',
-    'OnComplete' : 'задание выполнено',
-  },
-
-  SHOWPOLICY : {
-    'SHOW_ALL' : 0,
-    'SHOW_USER' : 1,
-    'SHOW_FREE' : 2
-  },
-    
-  templates : {
-    sign : {
-      success : {
-	id : 'sign_success',
-	domElements : [
-	  {
-	    element : '#sign',
-	    method : 'hide'
-	  },
-	  {
-	    element : '#lSelectDroneMain',
-	    method : 'show'
-	  },
-	  {
-	    element : '#lRegister',
-	    method : 'hide'
-	  },
-	  {
-	    element : '#lSignOnMain',
-	    method : 'hide'
-	  },
-	  {
-	    element : '#signState',
-	    method : 'html',
-	    params : ['']
-	  }
-	]
-      },
-      failure : {
-	id : 'sign_failure',
-	domElements : [
-	  {
-	    element : '#signState',
-	    method : 'html',
-	    params : ['Ошибка! Вход не выполнен.']
-	  }
-	]
-      }
-    },
-    
-    reg : {
-      success : {
-	id : 'reg_success',
-	domElements : [
-	  {
-	    element : '#lRegister',
-	    method : 'hide'
-	  },
-	  {
-	    element : '#lSelectDroneMain',
-	    method : 'show'
-	  }
-	]
-      },
-      failure : {
-	id : 'reg_failure',
-	domElements : [
-	  {
-	    element : '#registerState',
-	    method : 'html',
-	    params : ['Ошибка! Регистрация не выполнена']
-	  }
-	]
-      }
-    },
-    
-    drone_show : {
-      success : {
-	id : 'drone_show_success',
-      },
-      failure : {
-	id : 'drone_show_failure',
-	alerts : ['Ошибка! Невозможно показать БИТС']
-      }
-    },
-    
-    drone_user_free : {
-      success : {
-	id : 'drone_user_free_success',
-      },
-      failure : {
-	id : 'drone_user_free_failure',
-      }
-    },
-    
-    drone_pick : {
-      success : {
-	id : 'drone_pick_success',
-	pages : ['FlightTask'],
-      },
-      failure : {
-	id : 'drone_pick_failure',
-	alerts : ['Невозможно изменить статус БИТС']
-      }
-    },
-    
-    task_start : {
-      success : {
-	id : 'task_start_success',
-      },
-      failure : {
-	id : 'task_start_failure',
-	alerts : ['Невозможно начать выполнение полетного задания']
-      }
-    },
-    
-    task_stop : {
-      success : {
-	id : 'task_stop_success',
-      },
-      failure : {
-	id : 'task_stop_failure',
-	alerts : ['Невозможно освободить БИТС']
-      }
-    },
-   
-    task_complete : {
-      success : {
-	id : 'task_complete_success',
-      },
-      failure : {
-	id : 'task_complete_failure',
-	alerts : ['Невозможно завершить полетное задание']
-      }
-    }
-  },
-  
   showDrones : function(response) {
     var drones = response.drones;
   
@@ -177,8 +28,8 @@ var CLOUDRONE = {
       drone.model = eval(drones[i].model);
       
       var isOwned = drone.user == localStorage.id;
-      var isFree = drone.state == CLOUDRONE.STATES['Free'];
-      var isOnTask = drone.state == CLOUDRONE.STATES['OnTask'];
+      var isFree = drone.state == this.STATES['Free'];
+      var isOnTask = drone.state == this.STATES['OnTask'];
      
       $('#droneTable').append('<tr id="droneId' + id
 	+ '" onClick="CLOUDRONE.selectDrone(' + id + ');"><td align="center"><img src="'
@@ -188,17 +39,26 @@ var CLOUDRONE = {
 	+ drone.location +'</td><td align="center">'
 	+ (isFree ? 'Свободен' : 'Занят') + '</td><td align="center"><button onClick="CLOUDRONE.pickDrone('
 	+ id + ');" ' + ((isOwned || isFree) ? '' : 'disabled')
-	+ '>Выбрать</button></td><td align="center"><button onClick="CLOUDRONE.stopTask('
+	+ '>Выбрать</button></td><td align="center"><button onClick="CLOUDRONE.freeDrone('
 	+ id + ');" ' + ((isOwned) ? '' : 'disabled')
-	+ '>Освободить</button></td></tr>');
+	+ ' style = "display:' + ((CLOUDRONE.currentShowPolicy == 'SHOW_FREE') ? 'none' : 'block')
+	+ '">Освободить</button></td></tr>');
     }
       
     if (response.refresh) {
-      CLOUDRONE.drones = response.drones;
+      this.drones = response.drones;
     }
   },
   
-  stopTask : function(id) {
+  doShowDrones : function() {
+    WORKER_COMM.doShowDrones({
+      policy : CLOUDRONE.SHOWPOLICY[CLOUDRONE.currentShowPolicy],
+      user : localStorage.id,
+    },
+    CLOUDRONE.templates.drone_show);
+  },
+  
+  freeDrone : function(id) {
     WORKER_COMM.doSetState({
       state: {
 	id : id,
@@ -206,7 +66,7 @@ var CLOUDRONE = {
       },
       nstate : CLOUDRONE.STATES['Free'],
     },
-    CLOUDRONE.templates.task_stop);
+    CLOUDRONE.templates.drone_user_free);
   },
 
   selectDrone : function(id) {
@@ -233,7 +93,7 @@ var CLOUDRONE = {
   },
   
   showDroneName : function() {
-    var pages = ['FlightTask', 'Monitoring', 'Result'];
+    var pages = PAGE.dronePages;
     
     for(var i in pages) {
       $('#lDroneName' + pages[i]).html('Выбран БИТС: <b>' + CLOUDRONE.drones[CLOUDRONE.pickedDrone].name + '</b>');
@@ -241,7 +101,6 @@ var CLOUDRONE = {
   },
   
   pickDrone : function(id) {
-      /**/
     $('#markers').empty();
        
     if(CLOUDRONE.drones[id].name=='TestDroneObj') {
@@ -259,6 +118,7 @@ var CLOUDRONE = {
     CLOUDRONE.fetchMaps(id);
     
     switch(state) {
+      case CLOUDRONE.STATES['TaskCompleted'] :
       case CLOUDRONE.STATES['Free'] :
 	WORKER_COMM.doSetState({
 	  state : {
@@ -274,12 +134,12 @@ var CLOUDRONE = {
 	CLOUDRONE.setButtons({
 	  toEnable : ['#bFlightTaskInput']
 	});
+	CLOUDRONE.showDroneName();
+	$('#droneState').html(CLOUDRONE.WRITESTATES['WaitTask']);
 	break;
       case CLOUDRONE.STATES['OnTask'] :
 	WORKER_COMM.initMonitoring(id);
-	break;
-      case CLOUDRONE.STATES['TaskCompleted'] :
-	CLOUDRONE.showResults(id);
+	CLOUDRONE.showDroneName();
 	break;
     }
     CLOUDRONE.map.invalidateSize(false);
@@ -293,18 +153,16 @@ var CLOUDRONE = {
       toEnable : ['#bStart'],
       toDisable : ['#bStop']
     });
-
-    if(CLOUDRONE.drones[id].name=='TestDroneDist')  
-      $('#distInfo').load('dist/TestDroneDist.html');
     
-    if(CLOUDRONE.drones[id].name=='TestDroneMaxDist')  
-      $('#distInfo').load('dist/TestDroneMaxDist.html');
-      
-    if(CLOUDRONE.drones[id].name=='TestDroneMinDist')  
-      $('#distInfo').load('dist/TestDroneMinDist.html');
-      
-    if(CLOUDRONE.drones[id].name=='TestDroneDist2')  
-      $('#distInfo').load('dist/TestDroneDist2.html');
+    if (CLOUDRONE.drones[id].name !== 'TestDroneObj') {
+      $('#distInfo').load('dist/' + CLOUDRONE.drones[id].name + '.html');
+      $('#distResult').show();
+      $('#markersResult').hide();
+    }
+    else {
+      $('#distResult').hide();
+      $('#markersResult').show();
+    }
   },
   
   getState : function(id) {
@@ -313,11 +171,18 @@ var CLOUDRONE = {
   
   setState : function(id, nstate) {
     switch (nstate) {
+      case CLOUDRONE.STATES['Selected'] :
+	PAGE.showPage('FlightTask');
+	CLOUDRONE.setButtons({
+	  toEnable : ['#bFlightTaskInput']
+	});
+	break;
       case CLOUDRONE.STATES['TaskCompleted'] :
 	CLOUDRONE.showResults(id);
 	break;
       case CLOUDRONE.STATES['OnTask'] :
-	CLOUDRONE.initFlightCommands(id);
+	//CLOUDRONE.initFlightCommands(id);
+	$('#droneState').html(CLOUDRONE.WRITESTATES['OnTask']);
 	break;
     };
     
@@ -335,7 +200,6 @@ var CLOUDRONE = {
   },
   
   showUserName : function() {
-    
     var pages = ['Main', 'FlightTask', 'Monitoring', 'Result'];
     
     for(var i in pages) {
@@ -352,7 +216,18 @@ var CLOUDRONE = {
 	},
 	isPageUpdate : false
      },
-      this.templates.sign);
+      this.templates.sign_on);
+  },
+  
+  doSignOnReload : function() {
+    if (localStorage.id !== '') {
+      WORKER_COMM.doSign({
+	user : {
+	id : localStorage.id
+	},
+	isPageUpdate : true
+      }, this.templates.sign_on);
+    }
   },
   
   doRegister : function() {
@@ -361,7 +236,7 @@ var CLOUDRONE = {
 	  id : $('#registerId').val(),
 	  password : $('#registerPassword').val()
 	}
-     },
+      },
       this.templates.reg);
   },
   
@@ -401,8 +276,8 @@ var CLOUDRONE = {
      
       drone.taskTime = new Date().getTime();
       
-      $('#elapsedTime').html('00:00:00');
-      $('#droneState').html(CLOUDRONE.WRITESTATES['OnTask']);
+      CLOUDRONE.clearTheClocks('#elapsedTime');
+      $('#droneState').html(CLOUDRONE.WRITESTATES['WaitNavdata']);
 	
       PAGE.showPage('Monitoring');
       
@@ -493,9 +368,9 @@ var CLOUDRONE = {
     
       if(this.counter == 10)
       {
-	var info = '<tr><td><div id="videoMarker">Обнаруженные маркеры:</td></tr>';
-      info += '<tr><td>' + "<img src='object/1.png'/>" + '</td><td>' + 'Класс1'+ '</td></tr>';
-      $('#markersInfo').append(info);
+	//var info = '<tr><td><div id="videoMarker">Обнаруженные маркеры:</td></tr>';
+	var info = '<tr><td>' + "<img src='object/1.png'/>" + '</td><td>' + 'Класс1'+ '</td></tr>';
+	$('#markersInfo').append(info);
       }
       
       
@@ -516,6 +391,10 @@ var CLOUDRONE = {
   
   stopTheClocks : function(clocks) {
     clearInterval(clocks);
+  },
+  
+  clearTheClocks : function(clocks) {
+    $(clocks).html('00:00:00');
   },
   
   setButtons : function(buttons) {

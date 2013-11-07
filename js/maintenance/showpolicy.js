@@ -1,0 +1,7 @@
+CLOUDRONE.SHOWPOLICY = {
+  'SHOW_ALL' : 0,
+  'SHOW_USER' : 1,
+  'SHOW_FREE' : 2
+};
+
+CLOUDRONE.currentShowPolicy = 'SHOW_ALL';

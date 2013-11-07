@@ -27,14 +27,11 @@ var WORKER_COMM = {
 	else {
 	  switch (response.error) {
 	    case 254 :
-	      localStorage.id = response.id;
-	      PAGE.showPage('Main');
-	      CLOUDRONE.showUserName();
+	      WORKER_COMM.serviceResponse(response, CLOUDRONE.templates['sign_on']['success']);
 	      break;
 	      
 	    case 255 :
-	      localStorage.id = '';
-	      $('#lSignOffMain').trigger('click');
+	      WORKER_COMM.serviceResponse(response, CLOUDRONE.templates['sign_off']['success']);
 	      break;
 	      
 	    default :
@@ -49,10 +46,13 @@ var WORKER_COMM = {
   serviceResponse : function(response, template) {
     switch (template.id) {
       
-      case 'sign_success' :
+      case 'sign_on_success' :
 	localStorage.id = response.id;
-	$('#lSignOffMain').show();
 	CLOUDRONE.showUserName();
+	break;
+      
+      case 'sign_off_success' :
+	localStorage.id = '';
 	break;
 	
       case 'sign_failure' :
@@ -66,9 +66,6 @@ var WORKER_COMM = {
 	
       case 'drone_pick_success' :
 	CLOUDRONE.setState(response.state.id, response.state.state);
-	CLOUDRONE.setButtons({
-	  toEnable : ['#bFligthTaskInput'],
-	});
 	CLOUDRONE.showDroneName();
 	break;
 	
@@ -78,39 +75,19 @@ var WORKER_COMM = {
 	break;
 	
       case 'drone_user_free_success' :
-	WORKER_COMM.doShowDrones({
-	  policy : CLOUDRONE.SHOWPOLICY.SHOW_ALL,
-	},
-	CLOUDRONE.templates.drone_show);
+	CLOUDRONE.doShowDrones();
 	break;
 	
       case 'task_stop_success' :
 	CLOUDRONE.setState(response.state.id, response.state.state); 
-	WORKER_COMM.doShowDrones({
-	  policy : CLOUDRONE.SHOWPOLICY.SHOW_ALL,
-	},
-	CLOUDRONE.templates.drone_show);
+	CLOUDRONE.doShowDrones();
 	break;
     };
-    
-    var pages = template.pages;
-    
-    for (var id = 0; id < ((pages) ? pages.length : 0) ; id ++) {
-      PAGE.showPage(pages[id]);
-    }
+
+    PAGE.showPage(template.page);
+    PAGE.callDomMethods(template.domElements);
   
     CLOUDRONE.map.invalidateSize(false);
-
-    var domElements = template.domElements;
-    
-    for (var id = 0; id < ((domElements) ? domElements.length : 0) ; id ++) {
-      
-      var domElem = domElements[id].element;
-      var method = domElements[id].method;
-      var params = domElements[id].params;
-      
-      $(domElem)[method](params);
-    }
     
     for (var id = 0; id < ((template.alerts) ? template.alerts.length : 0) ; id ++) {
       alert(template.alerts[id]);
@@ -135,7 +112,7 @@ var WORKER_COMM = {
       responseFailure : template.failure
     });
     
-    return true;
+    return false;
   },
   
   doRegister : function(input, template) {
@@ -150,7 +127,7 @@ var WORKER_COMM = {
       responseFailure : template.failure
     });
     
-    return true;
+    return false;
   },
   
   doShowDrones : function(input, template) {
@@ -243,7 +220,7 @@ var WORKER_COMM = {
       pickedDrone = CLOUDRONE.pickedDrone;
       
       if (CLOUDRONE.drones[pickedDrone].state === CLOUDRONE.STATES['WaitNavdata']) {
-        CLOUDRONE.setState(pickedDrone, 'OnTask'); // Begin task
+        CLOUDRONE.setState(pickedDrone, CLOUDRONE.STATES['OnTask']); // Begin task
       }
       
       var data = navdata.data;

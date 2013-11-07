@@ -11,19 +11,7 @@ $(document).ready(function() {
     mjpegport : 12001
   });
   
-  if (localStorage.id !== '') {
-    $('#lSignOff').show();
-  }
-  else {
-    $('#lSignOff').hide();
-  }
-  
-  WORKER_COMM.doSign({
-      user : {
-	id : localStorage.id
-      },
-      isPageUpdate : true
-  }, CLOUDRONE.templates.sign);
+  CLOUDRONE.doSignOnReload();
 
   CLOUDRONE.map = L.map('taskMap').setView([0, 0], 0);
   
