@@ -4,12 +4,12 @@ $(document).ready(function() {
   
   PAGE.setPages();
     
-  WORKER_COMM.initRos(/*{
+  WORKER_COMM.initRos({
     roshostname : '46.47.1.24',
     rosport : 12000,
     mjpeghostname : '46.47.1.24',
     mjpegport : 12001
-  }*/);
+  });
   
   if (localStorage.id !== '') {
     $('#lSignOff').show();
