@@ -16,7 +16,13 @@
 <script type="text/javascript" src="../js/drones/ardrone2.js"></script>
 <script type="text/javascript" src="../js/worker_comm.js"></script>
 <script type="text/javascript" src="../js/cloudrone.js"></script>
+<script type="text/javascript" src="../js/maintenance/templates.js"></script>
+<script type="text/javascript" src="../js/maintenance/states.js"></script>
+<script type="text/javascript" src="../js/maintenance/writestates.js"></script>
+<script type="text/javascript" src="../js/maintenance/showpolicy.js"></script>
 <script type="text/javascript" src="../js/page.js"></script>
+<script type="text/javascript" src="../js/maintenance/pagesetup.js"></script>
+<script type="text/javascript" src="../js/maintenance/pagedomstofetch.js"></script>
 <script type="text/javascript" src="../js/onready.js"></script>
 
 <meta charset="UTF-8">
@@ -39,15 +45,15 @@
 	  <li id="lSignOffMain" style="display:none"><a href="#">Выйти</a></li>
 	</ul>
       </div>
-    </div>
-  <div id="headerSelectDrone" style="display:none">
-    <h2>Выбор БИТС</h2>
-      <div class="headerRadio">
-	<ul class="headerRadio">
-	  <input type="radio" name="showDrones" value="showDronesUser" id="showDronesUser" /> Показывать ваши
-	  <input type="radio" name="showDrones" value="showDronesFree" id="showDronesFree" /> Показывать свободные
-	  <input type="radio" name="showDrones" value="showDronesAll" id="showDronesAll" checked /> Показывать все
-	</ul>
+    <div id="headerSelectDrone" style="display:none">
+      <h2>Выбор БИТС</h2>
+	<div class="headerRadio">
+	  <ul class="headerRadio">
+	    <input type="radio" name="showDrones" value="showDronesUser" id="showDronesUser" /> Показывать ваши
+	    <input type="radio" name="showDrones" value="showDronesFree" id="showDronesFree" /> Показывать свободные
+	    <input type="radio" name="showDrones" value="showDronesAll" id="showDronesAll" checked /> Показывать все
+	  </ul>
+	</div>
       </div>
     </div>
   <div id="headerFlightTask" style="display:none">
