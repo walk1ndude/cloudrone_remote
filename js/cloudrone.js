@@ -134,6 +134,7 @@ var CLOUDRONE = {
 	  toEnable : ['#bFlightTaskInput']
 	});
 	CLOUDRONE.showDroneName();
+	$('#droneState').html(CLOUDRONE.WRITESTATES['WaitTask']);
 	break;
       case CLOUDRONE.STATES['OnTask'] :
 	WORKER_COMM.initMonitoring(id);
@@ -155,18 +156,13 @@ var CLOUDRONE = {
       toEnable : ['#bStart'],
       toDisable : ['#bStop']
     });
-
-    if(CLOUDRONE.drones[id].name=='TestDroneDist')  
-      $('#distInfo').load('dist/TestDroneDist.html');
     
-    if(CLOUDRONE.drones[id].name=='TestDroneMaxDist')  
-      $('#distInfo').load('dist/TestDroneMaxDist.html');
-      
-    if(CLOUDRONE.drones[id].name=='TestDroneMinDist')  
-      $('#distInfo').load('dist/TestDroneMinDist.html');
-      
-    if(CLOUDRONE.drones[id].name=='TestDroneDist2')  
-      $('#distInfo').load('dist/TestDroneDist2.html');
+    if (CLOUDRONE.drones[id].name !== 'TestDroneObj') {
+      $('#distInfo').load('dist/' + CLOUDRONE.drones[id].name + '.html');
+    }
+    else {
+      $('#distInfo').html('');
+    }
   },
   
   getState : function(id) {
