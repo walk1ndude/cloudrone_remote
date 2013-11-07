@@ -55,7 +55,7 @@ var WORKER_COMM = {
 	localStorage.id = '';
 	break;
 	
-      case 'sign_failure' :
+      case 'sign_on_failure' :
 	localStorage.id = '';
 	break;
       
