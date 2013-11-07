@@ -118,6 +118,7 @@ var CLOUDRONE = {
     CLOUDRONE.fetchMaps(id);
     
     switch(state) {
+      case CLOUDRONE.STATES['TaskCompleted'] :
       case CLOUDRONE.STATES['Free'] :
 	WORKER_COMM.doSetState({
 	  state : {
@@ -138,10 +139,6 @@ var CLOUDRONE = {
 	break;
       case CLOUDRONE.STATES['OnTask'] :
 	WORKER_COMM.initMonitoring(id);
-	CLOUDRONE.showDroneName();
-	break;
-      case CLOUDRONE.STATES['TaskCompleted'] :
-	CLOUDRONE.showResults(id);
 	CLOUDRONE.showDroneName();
 	break;
     }
