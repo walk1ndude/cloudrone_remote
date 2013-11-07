@@ -281,6 +281,9 @@ var CLOUDRONE = {
 	
       PAGE.showPage('Monitoring');
       
+      CLOUDRONE.emptyNavdataInfo();
+      CLOUDRONE.emptyCameraInfo();
+      
       WORKER_COMM.doSetState({
 	state : {
 	  id : pickedDrone,
@@ -410,7 +413,11 @@ var CLOUDRONE = {
   },
   
   emptyNavdataInfo : function() {
-    $('#sensorsInfo').empty();
+    $('#sensorsInfo').html('');
+  },
+  
+  emptyCameraInfo : function() {
+    $('#droneCamera').html('');
   },
   
   printNavdataInfo : function(data, value) {
