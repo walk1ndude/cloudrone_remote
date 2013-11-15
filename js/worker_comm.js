@@ -229,7 +229,20 @@ var WORKER_COMM = {
       
       for(var key in data) {
         isValueObject = data[key] instanceof Object;
-        value = (isValueObject) ? data[key].states[message[key]] : message[key];
+        if (isValueObject) {
+            value = data[key].states[message[key]];
+            if (key === 'state') {
+                console.log(value);
+                if (CLOUDRONE.drones[pickedDrone].navdataState === 'посадка' && value === 'на земле') {
+                    CLOUDRONE.setWriteState(CLOUDRONE.WRITESTATES['WaitComplete']);
+                    WORKER_COMM.monitoringCancel();
+                }
+                CLOUDRONE.drones[pickedDrone].navdataState = value;
+            }
+        }
+        else {
+            value = message[key];
+        }
         CLOUDRONE.printNavdataInfo(((isValueObject) ? data[key].name : data[key]), value);
       }
     });
