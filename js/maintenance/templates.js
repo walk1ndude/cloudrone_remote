@@ -277,7 +277,7 @@ CLOUDRONE.templates = {
 	element : '#headerSelectDrone',
 	method : 'hide'
       },
-      ],
+      ]
     }
   }
 };
