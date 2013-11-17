@@ -51,6 +51,7 @@ var PAGE = {
   },
   
   callDomMethods : function(domElements) {
+
     for (var id = 0; id < ((domElements) ? domElements.length : 0) ; id ++) {
       
       var domElem = domElements[id].element;
@@ -60,10 +61,10 @@ var PAGE = {
 	$(domElem)[0].reset();
       }
       else {
-	var params = domElements[id].params;
-	$(domElem)[method](params);
+	    var params = domElements[id].params;
+	    $(domElem)[method].apply($(domElem), params);
+        }
       }
-    }
   },
   
   setPages : function() {

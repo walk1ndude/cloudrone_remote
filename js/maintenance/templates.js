@@ -4,6 +4,14 @@ CLOUDRONE.templates = {
       id : 'sign_on_success',
       page : 'Main',
       domElements : [
+    {
+      method : 'toastmessage',
+      params : ['showToast',
+          {
+            type : 'success',
+            text : 'Вход выполнен успешно'
+          }]
+    },
 	{
 	  element : '#sign',
 	  method : 'hide'
@@ -38,11 +46,14 @@ CLOUDRONE.templates = {
     failure : {
       id : 'sign_on_failure',
       domElements : [
-	{
-	  element : '#signState',
-	  method : 'html',
-	  params : ['Данный пользователь не зарегистрирован']
-	},
+          {
+              method : 'toastmessage',
+              params : ['showToast',
+                  {
+                      type : 'error',
+                      text : 'Данный пользователь не зарегистрирован'
+                  }]
+          },
 	{
 	  element : '#sign',
 	  method : 'hide',
@@ -60,10 +71,13 @@ CLOUDRONE.templates = {
       page : 'Main',
       domElements : [
 	{
-	  element : '#signState',
-	  method : 'html',
-	  params : ['Выход выполнен успешно'],
-	},
+        method : 'toastmessage',
+        params : ['showToast',
+            {
+                type : 'success',
+                text : 'Выход выполнен успешно'
+            }]
+    },
 	{
 	  element : '#lSignOffMain',
 	  method : 'hide'
@@ -93,12 +107,15 @@ CLOUDRONE.templates = {
     failure : {
       id : 'sign_off_failure',
       domElements : [
-	{
-	  element : '#signState',
-	  method : 'html',
-	  params : ['Ошибка! Выход не выполнен.']
-	},
-	{
+          {
+              method : 'toastmessage',
+              params : ['showToast',
+                  {
+                      type : 'error',
+                      text : 'Ошибка! Выход не выполнен!'
+                  }]
+          },
+          {
 	  element : '#headerSelectDrone',
 	  method : 'hide'
 	},
@@ -110,7 +127,15 @@ CLOUDRONE.templates = {
     success : {
       id : 'reg_success',
       domElements : [
-	{
+          {
+              method : 'toastmessage',
+              params : ['showToast',
+                  {
+                      type : 'success',
+                      text : 'Пользователь успешно зарегистрирован'
+                  }]
+          },
+          {
 	  element : '#lRegister',
 	  method : 'hide'
 	},
@@ -127,11 +152,14 @@ CLOUDRONE.templates = {
     failure : {
       id : 'reg_failure',
       domElements : [
-	{
-	  element : '#registerState',
-	  method : 'html',
-	  params : ['Ошибка! Регистрация не выполнена']
-	},
+          {
+              method : 'toastmessage',
+              params : ['showToast',
+                  {
+                      type : 'error',
+                      text : 'Ошибка! Регистрация не выполнена!'
+                  }]
+          },
 	{
 	  element : '#headerSelectDrone',
 	  method : 'hide'
@@ -249,7 +277,7 @@ CLOUDRONE.templates = {
 	element : '#headerSelectDrone',
 	method : 'hide'
       },
-      ],
+      ]
     }
   }
 };

@@ -1,36 +1,36 @@
 var CLOUDRONE = {
-  
+
   KOSTILEV : 360.0/20.0,
-  
+
   selectedDrone : -1,
   pickedDrone : -1,
-  
+
   selectedMarker : 0,
   markerPopup : null,
-  
+
   counter : 0,
   interval : null,
-  
+
   markers : {},
-  
+
   drones : {},
-  
+
   showDrones : function(response) {
     var drones = response.drones;
-  
+
     $('#droneTable').html('<tr><th>Фото</th><th>Название</th><th>Модель</th><th>Расположение</th><th>Статус</th><th colspan="2"></th></tr>');
-  
+
     for (var i = 0; i < drones.length; i ++ ) {
-      
+
       drone = drones[i];
-      
+
       id = drone.id;
       drone.model = eval(drones[i].model);
-      
+
       var isOwned = drone.user == localStorage.id;
       var isFree = drone.state == this.STATES['Free'];
       var isOnTask = drone.state == this.STATES['OnTask'];
-     
+
       $('#droneTable').append('<tr id="droneId' + id
 	+ '" onClick="CLOUDRONE.selectDrone(' + id + ');"><td align="center"><img src="'
 	+ drone.model.photo +'" width="50px"></img></td><td align="center">'
@@ -41,121 +41,121 @@ var CLOUDRONE = {
 	+ id + ');" ' + ((isOwned || isFree) ? '' : 'disabled')
 	+ '>Выбрать</button></td><td align="center"><button onClick="CLOUDRONE.freeDrone('
 	+ id + ');" ' + ((isOwned) ? '' : 'disabled')
-	+ ' style = "display:' + ((CLOUDRONE.currentShowPolicy == 'SHOW_FREE') ? 'none' : 'block')
+	+ ' style = "display:' + ((this.currentShowPolicy == 'SHOW_FREE') ? 'none' : 'block')
 	+ '">Освободить</button></td></tr>');
     }
-      
+
     if (response.refresh) {
       this.drones = response.drones;
     }
   },
-  
+
   doShowDrones : function() {
     WORKER_COMM.doShowDrones({
-      policy : CLOUDRONE.SHOWPOLICY[CLOUDRONE.currentShowPolicy],
+      policy : this.SHOWPOLICY[this.currentShowPolicy],
       user : localStorage.id,
     },
-    CLOUDRONE.templates.drone_show);
+    this.templates.drone_show);
   },
-  
+
   freeDrone : function(id) {
     WORKER_COMM.doSetState({
       state: {
 	id : id,
-	state : CLOUDRONE.drones[id].state
+	state : this.drones[id].state
       },
-      nstate : CLOUDRONE.STATES['Free'],
+      nstate : this.STATES['Free'],
     },
-    CLOUDRONE.templates.drone_user_free);
+    this.templates.drone_user_free);
   },
 
   selectDrone : function(id) {
-    $('#droneId' + CLOUDRONE.selectedDrone).css("background-color", "#FFFFFF");
+    $('#droneId' + this.selectedDrone).css("background-color", "#FFFFFF");
     $('#droneId' + id).css("background-color", "#DDDDDD");
-  
+
     var specs = '';
-    var specsArray = CLOUDRONE.drones[id].model.specs;
-      
+    var specsArray = this.drones[id].model.specs;
+
     for (spec in specsArray) {
       specs += '<tr><td><b>' + spec + '</b></td><td>' + specsArray[spec] + '</td></tr>'
     }
 
     $('#selectDroneInfo').html('<h3>Информация о выделенном БПЛА</h3><table><tr><td><img src="'
-    + CLOUDRONE.drones[id].model.photo+'" width="100px" style="float:left"></img></td><td><b>Модель:</b> '
-    + CLOUDRONE.drones[id].model.name+'</td><tr><td colspan="2"><b>Характеристики</b></td></tr>'
+    + this.drones[id].model.photo+'" width="100px" style="float:left"></img></td><td><b>Модель:</b> '
+    + this.drones[id].model.name+'</td><tr><td colspan="2"><b>Характеристики</b></td></tr>'
     + specs + '</table>');
-  
-    CLOUDRONE.selectedDrone = id;
+
+    this.selectedDrone = id;
   },
-  
+
   unselectDrone : function() {
     $('#selectDroneInfo').empty();
   },
-  
+
   showDroneName : function() {
     var pages = PAGE.dronePages;
-    
+
     for(var i in pages) {
-      $('#lDroneName' + pages[i]).html('Выбран БИТС: <b>' + CLOUDRONE.drones[CLOUDRONE.pickedDrone].name + '</b>');
+      $('#lDroneName' + pages[i]).html('Выбран БИТС: <b>' + this.drones[this.pickedDrone].name + '</b>');
     }
   },
-  
+
   pickDrone : function(id) {
     $('#markers').empty();
-       
-    if(CLOUDRONE.drones[id].name=='TestDroneObj') {
+
+    if(this.drones[id].name=='TestDroneObj') {
       var info = '<table>';
       info+='<tr><td>' + "<img src='object/m1.png'/>" + '</td><td>' + 'Эталон класса 1'+ '</td><td>' + 'Растр'+ '</td></tr>';
       info+='<tr><td>' + "<img src='object/m2.png'/>" + '</td><td>' + 'Эталон класса 2'+ '</td><td>' + 'Вектор'+ '</td></tr>';
       info+='</table>';
-      
+
       $('#markers').html(info);
     }
-   
+
     this.pickedDrone = id;
-    var state = CLOUDRONE.drones[id].state;
-    
-    CLOUDRONE.fetchMaps(id);
-    
+    var state = this.drones[id].state;
+
+    this.fetchMaps(id);
+
     switch(state) {
-      case CLOUDRONE.STATES['TaskCompleted'] :
-      case CLOUDRONE.STATES['Free'] :
+      case this.STATES['TaskCompleted'] :
+      case this.STATES['Free'] :
 	WORKER_COMM.doSetState({
 	  state : {
 	    id : id,
-	    state : CLOUDRONE.drones[id].state
+	    state : this.drones[id].state
 	  },
-	  nstate : CLOUDRONE.STATES['Selected'],
+	  nstate : this.STATES['Selected'],
 	},
-	CLOUDRONE.templates.drone_pick);
+	this.templates.drone_pick);
 	break;
-      case CLOUDRONE.STATES['Selected'] :
+      case this.STATES['Selected'] :
 	PAGE.showPage('FlightTask');
-	CLOUDRONE.setButtons({
+	this.setButtons({
 	  toEnable : ['#bFlightTaskInput']
 	});
-	CLOUDRONE.showDroneName();
-	$('#droneState').html(CLOUDRONE.WRITESTATES['WaitTask']);
+	this.showDroneName();
+    this.setWriteState(this.WRITESTATES['WaitTask']);
 	break;
-      case CLOUDRONE.STATES['OnTask'] :
+      case this.STATES['OnTask'] :
 	WORKER_COMM.initMonitoring(id);
-	CLOUDRONE.showDroneName();
+	this.showDroneName();
 	break;
     }
-    CLOUDRONE.map.invalidateSize(false);
+    this.map.invalidateSize(false);
   },
-  
+
   showResults : function(id) {
     PAGE.showPage('Result');
-    $('#droneState').html(CLOUDRONE.WRITESTATES['OnComplete']);
-    CLOUDRONE.stopTheClocks(CLOUDRONE.clocks);
-    CLOUDRONE.setButtons({
+    this.setWriteState(this.WRITESTATES['OnComplete']);
+    this.stopTheClocks(this.clocks);
+    this.setButtons({
       toEnable : ['#bStart'],
       toDisable : ['#bStop']
     });
-    
-    if (CLOUDRONE.drones[id].name !== 'TestDroneObj') {
-      $('#distInfo').load('dist/' + CLOUDRONE.drones[id].name + '.html');
+
+    if (this.drones[id].name !== 'TestDroneObj') {
+      $('#distInfo').load('dist/' + this.drones[id].name + '.html');
       $('#distResult').show();
       $('#markersResult').hide();
     }
@@ -164,50 +164,55 @@ var CLOUDRONE = {
       $('#markersResult').show();
     }
   },
-  
+
   getState : function(id) {
-    return CLOUDRONE.drones[id].state;
+    return this.drones[id].state;
   },
-  
+
   setState : function(id, nstate) {
     switch (nstate) {
-      case CLOUDRONE.STATES['Selected'] :
+      case this.STATES['Selected'] :
 	PAGE.showPage('FlightTask');
-	CLOUDRONE.setButtons({
+	this.setButtons({
 	  toEnable : ['#bFlightTaskInput']
 	});
 	break;
-      case CLOUDRONE.STATES['TaskCompleted'] :
-	CLOUDRONE.showResults(id);
+      case this.STATES['TaskCompleted'] :
+	this.showResults(id);
 	break;
-      case CLOUDRONE.STATES['OnTask'] :
-	//CLOUDRONE.initFlightCommands(id);
-	$('#droneState').html(CLOUDRONE.WRITESTATES['OnTask']);
+      case this.STATES['OnTask'] :
+	WORKER_COMM.initFlightCommands(id);
+	this.setWriteState(this.WRITESTATES['OnTask']);
 	break;
     };
-    
-    CLOUDRONE.setUser(id, CLOUDRONE.drones[id].state, nstate);
-    CLOUDRONE.drones[id].state = nstate;
+
+    this.setUser(id, this.drones[id].state, nstate);
+    this.drones[id].state = nstate;
   },
 
   setUser : function(id, cstate, nstate) {
-    if (cstate == CLOUDRONE.STATES['Free'] && nstate == CLOUDRONE.STATES['Selected']) {
-      CLOUDRONE.drones[id].user = localStorage.id;
+    if (cstate == this.STATES['Free'] && nstate == this.STATES['Selected']) {
+      this.drones[id].user = localStorage.id;
     }
-    else if (nstate == CLOUDRONE.STATES['Free']) {
-      CLOUDRONE.drones[id].user = '';
+    else if (nstate == this.STATES['Free']) {
+      this.drones[id].user = '';
     }
   },
-  
+
   showUserName : function() {
-    var pages = ['Main', 'FlightTask', 'Monitoring', 'Result'];
-    
+    var pages = [PAGE.mainPage].concat([PAGE.dronePages]);
+
     for(var i in pages) {
       $('#lUserName' + pages[i]).html('Вы вошли как: <b>' + localStorage.id + '</b>');
       $('#lUserName' + pages[i]).show();
     }
   },
-  
+
+  setWriteState : function(nstate) {
+    $().toastmessage('showNoticeToast', nstate);
+    $('#droneState').html(nstate);
+  },
+
   doSign : function() {
     return WORKER_COMM.doSign({
 	user : {
@@ -218,7 +223,7 @@ var CLOUDRONE = {
      },
       this.templates.sign_on);
   },
-  
+
   doSignOnReload : function() {
     if (localStorage.id !== '') {
       WORKER_COMM.doSign({
@@ -229,7 +234,7 @@ var CLOUDRONE = {
       }, this.templates.sign_on);
     }
   },
-  
+
   doRegister : function() {
     return WORKER_COMM.doRegister({
       user : {
@@ -239,20 +244,20 @@ var CLOUDRONE = {
       },
       this.templates.reg);
   },
-  
+
   fetchMaps : function(id) {
-     CLOUDRONE.map.remove();
+     this.map.remove();
      //CLOUDRONE.map.layers=[];
-     
+
      $.ajax({
         url: '../tiles_/'+'qwe'+id+'/map.txt',             // указываем URL и
         dataType : "text",                     // тип загружаемых данных
         success: function (data, textStatus) { // вешаем свой обработчик на функцию success
-           var map_info = jQuery.parseJSON(data);
-           CLOUDRONE.map_info = map_info;
-           CLOUDRONE.map = L.map('taskMap').setView([0, 0], 0);
-           L.tileLayer('../tiles_/'+'qwe'+id+'/{z}/{x}/{y}.png', {maxZoom: map_info.maxZoom, noWrap:true}).addTo(CLOUDRONE.map);
-           CLOUDRONE.map.markers = [];
+           var map_info = $.parseJSON(data);
+           this.map_info = map_info;
+           this.map = L.map('taskMap').setView([0, 0], 0);
+           L.tileLayer('../tiles_/'+'qwe'+id+'/{z}/{x}/{y}.png', {maxZoom: map_info.maxZoom, noWrap:true}).addTo(this.map);
+           this.map.markers = [];
         },
         error: function (xhr, status, error) {
            alert("Can not load map info: " + error);
@@ -265,25 +270,25 @@ var CLOUDRONE = {
     var pickedDrone = CLOUDRONE.pickedDrone;
     var drone = CLOUDRONE.drones[pickedDrone];
     var state = CLOUDRONE.getState(pickedDrone);
-    
+
     function onSelected() {
       $('#markersInfo').empty();
-      
+
       CLOUDRONE.setButtons({
 	toEnable : ['#bStop'],
 	toDisable : ['#bStart']
       });
-     
+
       drone.taskTime = new Date().getTime();
-      
+
       CLOUDRONE.clearTheClocks('#elapsedTime');
-      $('#droneState').html(CLOUDRONE.WRITESTATES['WaitNavdata']);
-	
+      CLOUDRONE.setWriteState(CLOUDRONE.WRITESTATES['WaitNavdata']);
+
       PAGE.showPage('Monitoring');
-      
+
       CLOUDRONE.emptyNavdataInfo();
       CLOUDRONE.emptyCameraInfo();
-      
+
       WORKER_COMM.doSetState({
 	state : {
 	  id : pickedDrone,
@@ -293,11 +298,11 @@ var CLOUDRONE = {
 	driver : drone.driver
       },
       CLOUDRONE.templates.task_start);
-      
+
       CLOUDRONE.clocks = CLOUDRONE.startTheClocks(CLOUDRONE.timerClick, 1000);
-     
+
     };
-    
+
     switch (state) {
       case CLOUDRONE.STATES['Selected'] :
 	onSelected();
@@ -307,21 +312,21 @@ var CLOUDRONE = {
 	break;
     };
   },
-  
+
   onClickStop : function() {
     var pickedDrone = CLOUDRONE.pickedDrone;
     var drone = CLOUDRONE.drones[pickedDrone];
     var state = CLOUDRONE.getState(pickedDrone);
-    
+
     function onTask() {
-      
+
       CLOUDRONE.stopTheClocks(CLOUDRONE.clocks);
-      
+
       CLOUDRONE.setButtons({
 	toEnable : ['#bStart'],
 	toDisable : ['#bStop']
       });
-     
+
       WORKER_COMM.doSetState({
 	state : {
 	  id : pickedDrone,
@@ -330,80 +335,80 @@ var CLOUDRONE = {
 	nstate : CLOUDRONE.STATES['TaskCompleted'],
       },
       CLOUDRONE.templates.task_complete);
-      
-      $('#droneState').html(CLOUDRONE.WRITESTATES['OnComplete']);
+
+      CLOUDRONE.setWriteState(CLOUDRONE.WRITESTATES['OnComplete']);
       PAGE.showPage('Result');
     }
-    
+
     switch (state) {
-      
+
       case CLOUDRONE.STATES['OnTask'] :
 	onTask();
 	break;
     };
   },
-  
-  
+
+
   timerClick : function() {
     var pickedDrone = CLOUDRONE.pickedDrone;
     var drone = CLOUDRONE.drones[pickedDrone];
-    
+
     var currentTime = new Date().getTime() - drone.taskTime;
-    
+
     var timeSeconds = Math.floor(currentTime / 1000);
-    
+
     var hours = Math.floor(timeSeconds / 3600);
     var minutes = Math.floor((timeSeconds % 3600) / 60);
     var seconds = Math.floor((timeSeconds % 3600) % 60);
-    
+
     function addLeadZero(number) {
       return ((number < 10) ? '0' : '') + number;
     }
-    
+
     counter++;
-    
+
     $('#elapsedTime').html( addLeadZero(hours) + ':'
 			  + addLeadZero(minutes) + ':'
 			  + addLeadZero(seconds));
-    
-    if(CLOUDRONE.drones[CLOUDRONE.pickedDrone].name=='TestDroneObj')
+
+    if(CLOUDRONE.drones[CLOUDRONE.pickedDrone].name == 'TestDroneObj')
     {
-    
+
       if(this.counter == 10)
       {
 	//var info = '<tr><td><div id="videoMarker">Обнаруженные маркеры:</td></tr>';
 	var info = '<tr><td>' + "<img src='object/1.png'/>" + '</td><td>' + 'Класс1'+ '</td></tr>';
 	$('#markersInfo').append(info);
       }
-      
-      
+
+
       if(this.counter == 12)
       {
       var info = '<tr><td>' + "<img src='object/2.png'/>" + '</td><td>' + 'Класс2'+ '</td></tr>';
       $('#markersInfo').append(info);
       }
     }
-    
+
   },
-  
+
   startTheClocks : function(method, interval, params) {
     return setInterval(function(){
       method(params);
-    }, interval); 
+    }, interval);
   },
-  
+
   stopTheClocks : function(clocks) {
     clearInterval(clocks);
   },
-  
+
   clearTheClocks : function(clocks) {
     $(clocks).html('00:00:00');
   },
-  
+
   setButtons : function(buttons) {
     var bEnable = buttons.toEnable;
     var bDisable = buttons.toDisable;
-    
+
     for (var i = 0; i < ((bEnable) ? bEnable.length : 0); i ++) {
       $(bEnable[i]).removeAttr('disabled');
     }
@@ -411,23 +416,23 @@ var CLOUDRONE = {
       $(bDisable[i]).attr('disabled', 'disabled');
     }
   },
-  
+
   emptyNavdataInfo : function() {
     $('#sensorsInfo').html('');
   },
-  
+
   emptyCameraInfo : function() {
     $('#droneCamera').html('');
   },
-  
+
   printNavdataInfo : function(data, value) {
   $('#sensorsInfo').append('<tr><td>' + data + '</td><td>'
-    + (isNaN(value) ? value : Math.round(value * 1000) / 1000)  + '</td></tr>'); 
+    + (isNaN(value) ? value : Math.round(value * 1000) / 1000)  + '</td></tr>');
   },
-  
+
   printMarkers : function(marker) {
     //$('#markersInfo').empty();
-    
+
     var info = '<tr><td><div id="videoMarker">Обнаруженные маркеры:</td></tr>';
     /*for(field in marker) {
       if (marker.hasOwnProperty(field) && field != 'view') {
@@ -437,10 +442,10 @@ var CLOUDRONE = {
     info += '<tr><td>' + "<img src='object/"+marker["viewid"]+".png'/>" + '</td><td>' + (marker["classid"] == 1 ? 'Класс1':'Класс2')+ '</td></tr>';
    // $('#markersInfo').append(info);
   },
-  
+
   loadFlightTask : function(evt) {
     var patt = new RegExp(/^[ \t]*goto([ \t]*(\-)?(\d)*(\.)?(\d)*){4}[ \t]*$/);
-    
+
     function sendCommands(flightPlan) {
 
      for(i in CLOUDRONE.map._layers) {
@@ -448,19 +453,19 @@ var CLOUDRONE = {
 	    CLOUDRONE.map.removeLayer(CLOUDRONE.maps.taskMap._layers[i]);
 	 }
       }
-	
+
       CLOUDRONE.drones[CLOUDRONE.pickedDrone].cmds = ["c start"];
-	  
+
       if (flightPlan.length > 0) {
 	  var flightCmds = flightPlan.split('\n');
 	  var markerId = 0;
-	  
+
 	  for (var c = 0; c < flightCmds.length; c++) {
 	    if (!!flightCmds[c]) {
-	         
+
 	      if (flightCmds[c].match(patt)) { // if goto numbers
 		var numbers = flightCmds[c].trim().split(" ");
-		
+
 		if (CLOUDRONE.map_info)
 		{
 		  for (var j = 1; j <= 2; j++) {
@@ -472,43 +477,43 @@ var CLOUDRONE = {
 		//CLOUDRONE.maps.taskMap.markers[markerId ++] = L.marker([numbers[3]*CLOUDRONE.KOSTILEV, //numbers[4]*CLOUDRONE.KOSTILEV]).addTo(CLOUDRONE.maps.taskMap);
 		}
 	      }
-	      
+
 	      CLOUDRONE.drones[CLOUDRONE.pickedDrone].cmds.push("c " + flightCmds[c]);
 	    }
 	  }
 	}
     }
-    
+
     function drawPolyline() {
       var map = CLOUDRONE.map;
       var markers = [];
-      
+
       for (var i = 0; i < map.markers.length; i++) {
 	markers.push(map.markers[i].getLatLng());
       }
-      
+
       L.polyline(markers,{color: 'red'}).addTo(map);
     }
-    
+
     var files = evt.target.files;
     for (var i = 0, f; f = files[i]; i++) {
 
       var reader = new FileReader();
       CLOUDRONE.map.markers = [];
-      
+
       reader.onload = function(e) {
 	  var xml = e.target.result;
-	  sendCommands($(xml).find("flightPlan").text()); 
+	  sendCommands($(xml).find("flightPlan").text());
 	  drawPolyline();
 	  var objectList = $(xml).find("objectList").text();
       };
       reader.readAsBinaryString(f);
     }
-    
+
     CLOUDRONE.setButtons({
       toEnable : ['#bStart'],
     });
-    
-    $('#droneState').html(CLOUDRONE.WRITESTATES['WaitLaunch']);
+
+    this.setWriteState(CLOUDRONE.WRITESTATES['WaitLaunch']);
   }
 }

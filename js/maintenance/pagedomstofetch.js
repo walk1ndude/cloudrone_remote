@@ -193,8 +193,7 @@ PAGE.domsToFetch = [
     },
     {
       element : '#signState',
-      method : 'html',
-      params : '',
+      method : 'empty',
     }
     ]
   },
@@ -211,8 +210,7 @@ PAGE.domsToFetch = [
     },
     {
       element : '#registerState',
-      method : 'html',
-      params : '',
+      method : 'empty',
     }
     ]
   },
