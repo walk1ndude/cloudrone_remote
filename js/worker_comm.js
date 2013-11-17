@@ -232,7 +232,6 @@ var WORKER_COMM = {
         if (isValueObject) {
             value = data[key].states[message[key]];
             if (key === 'state') {
-                console.log(value);
                 if (CLOUDRONE.drones[pickedDrone].navdataState === 'посадка' && value === 'на земле') {
                     CLOUDRONE.setWriteState(CLOUDRONE.WRITESTATES['WaitComplete']);
                     WORKER_COMM.monitoringCancel();
