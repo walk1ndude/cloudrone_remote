@@ -246,18 +246,20 @@ var CLOUDRONE = {
   },
 
   fetchMaps : function(id) {
+     this.map_markers = [];
+     this.map_polyline = undefined;
      this.map.remove();
-     //CLOUDRONE.map.layers=[];
+     this.clearMap();
+     $('#bFlightTaskInput').val('');
 
      $.ajax({
         url: '../tiles_/'+'qwe'+id+'/map.txt',             // указываем URL и
         dataType : "text",                     // тип загружаемых данных
         success: function (data, textStatus) { // вешаем свой обработчик на функцию success
-           var map_info = $.parseJSON(data);
-           this.map_info = map_info;
-           this.map = L.map('taskMap').setView([0, 0], 0);
-           L.tileLayer('../tiles_/'+'qwe'+id+'/{z}/{x}/{y}.png', {maxZoom: map_info.maxZoom, noWrap:true}).addTo(this.map);
-           this.map.markers = [];
+           CLOUDRONE.map_info = $.parseJSON(data);
+           CLOUDRONE.map = L.map('taskMap').setView([0, 0], 0);
+           L.tileLayer('../tiles_/'+'qwe'+id+'/{z}/{x}/{y}.png', {maxZoom: CLOUDRONE.map_info.maxZoom, noWrap:true}).addTo(CLOUDRONE.map);
+           CLOUDRONE.map.markers = [];
         },
         error: function (xhr, status, error) {
            alert("Can not load map info: " + error);
@@ -442,23 +444,35 @@ var CLOUDRONE = {
     info += '<tr><td>' + "<img src='object/"+marker["viewid"]+".png'/>" + '</td><td>' + (marker["classid"] == 1 ? 'Класс1':'Класс2')+ '</td></tr>';
    // $('#markersInfo').append(info);
   },
+   
+    clearMap : function()
+    {
+      //for (var i = 0; i < CLOUDRONE.map._layers.length; i++)
+      //if (CLOUDRONE.map._layers[i]._path != undefined)
+      //   CLOUDRONE.map.removeLayer(CLOUDRONE.map._layers[i]);
+      for (var i = 0; i < CLOUDRONE.map_markers.length; i++)
+        CLOUDRONE.map.removeLayer(CLOUDRONE.map_markers[i]);
+      if (CLOUDRONE.map_polyline)
+        CLOUDRONE.map.removeLayer(CLOUDRONE.map_polyline);
+      CLOUDRONE.map_markers = [];
+      CLOUDRONE.map_polyline = undefined;
+    },
+
 
   loadFlightTask : function(evt) {
     var patt = new RegExp(/^[ \t]*goto([ \t]*(\-)?(\d)*(\.)?(\d)*){4}[ \t]*$/);
 
     function sendCommands(flightPlan) {
-
-     for(i in CLOUDRONE.map._layers) {
-         if(CLOUDRONE.map._layers[i]._path != undefined) {
-	    CLOUDRONE.map.removeLayer(CLOUDRONE.maps.taskMap._layers[i]);
-	 }
-      }
+      
+      // mark start point
+      var markerId = 0;
+      if (CLOUDRONE.map_info)
+        CLOUDRONE.map_markers[markerId ++] = L.marker([CLOUDRONE.map_info.zero[1] / CLOUDRONE.map_info.size * 360.0, CLOUDRONE.map_info.zero[0] / CLOUDRONE.map_info.size * 360.0]).addTo(CLOUDRONE.map);
 
       CLOUDRONE.drones[CLOUDRONE.pickedDrone].cmds = ["c start"];
 
       if (flightPlan.length > 0) {
 	  var flightCmds = flightPlan.split('\n');
-	  var markerId = 0;
 
 	  for (var c = 0; c < flightCmds.length; c++) {
 	    if (!!flightCmds[c]) {
@@ -473,7 +487,7 @@ var CLOUDRONE = {
 		    while (numbers[j] < -180) numbers[j] += 360.;
 		    while (numbers[j] > 180) numbers[j] -= 360.;
 		  }
-		  CLOUDRONE.map.markers[markerId ++] = L.marker([numbers[2], numbers[1]]).addTo(CLOUDRONE.map);
+		  CLOUDRONE.map_markers[markerId ++] = L.marker([numbers[2], numbers[1]]).addTo(CLOUDRONE.map);
 		//CLOUDRONE.maps.taskMap.markers[markerId ++] = L.marker([numbers[3]*CLOUDRONE.KOSTILEV, //numbers[4]*CLOUDRONE.KOSTILEV]).addTo(CLOUDRONE.maps.taskMap);
 		}
 	      }
@@ -483,25 +497,23 @@ var CLOUDRONE = {
 	  }
 	}
     }
-
+    
     function drawPolyline() {
-      var map = CLOUDRONE.map;
       var markers = [];
-
-      for (var i = 0; i < map.markers.length; i++) {
-	markers.push(map.markers[i].getLatLng());
+      for (i in CLOUDRONE.map_markers) {
+	markers.push(CLOUDRONE.map_markers[i].getLatLng());
       }
-
-      L.polyline(markers,{color: 'red'}).addTo(map);
+      CLOUDRONE.map_polyline = L.polyline(markers,{color: 'red'}).addTo(CLOUDRONE.map);
     }
 
     var files = evt.target.files;
     for (var i = 0, f; f = files[i]; i++) {
 
       var reader = new FileReader();
-      CLOUDRONE.map.markers = [];
+      //CLOUDRONE.map.markers = [];
 
       reader.onload = function(e) {
+          CLOUDRONE.clearMap();
 	  var xml = e.target.result;
 	  sendCommands($(xml).find("flightPlan").text());
 	  drawPolyline();

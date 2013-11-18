@@ -257,6 +257,8 @@ var WORKER_COMM = {
         topic: namespace + video.topic
     });
     
+    if (this.stateWatcher)
+	this.stateWatcher.unsubscribe();
     this.stateWatcher = new ROSLIB.Topic({
       ros : this.ros,
       name : 'get_state',
