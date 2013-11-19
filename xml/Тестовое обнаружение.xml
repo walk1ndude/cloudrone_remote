@@ -1,7 +1,7 @@
 <flightTask>
   <flightPlan>
 autoInit 300 200 1000 0.5
-setMaxControl 0.2
+setMaxControl 10.2
 setInitialReachDist 0.2
 setStayWithinDist 0.5
 setStayTime 4

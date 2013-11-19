@@ -39,8 +39,8 @@ CLOUDRONE.templates = {
 	},
 	{
 	  element : '#lSignOffMain',
-	  method : 'show',
-	},
+	  method : 'show'
+	}
       ]
     },
     failure : {
@@ -56,12 +56,12 @@ CLOUDRONE.templates = {
           },
 	{
 	  element : '#sign',
-	  method : 'hide',
+	  method : 'hide'
 	},
 	{
 	  element : '#headerSelectDrone',
 	  method : 'hide'
-	},
+	}
       ]
     }
   },
@@ -96,11 +96,11 @@ CLOUDRONE.templates = {
 	},
 	{
 	  element : '#lRegister',
-	  method : 'show',
+	  method : 'show'
 	},
 	{
 	  element : '#lSignOnMain',
-	  method : 'show',
+	  method : 'show'
 	}
       ]
     },
@@ -118,7 +118,7 @@ CLOUDRONE.templates = {
           {
 	  element : '#headerSelectDrone',
 	  method : 'hide'
-	},
+	}
       ]
     }
   },
@@ -146,7 +146,7 @@ CLOUDRONE.templates = {
 	{
 	  element : '#headerSelectDrone',
 	  method : 'hide'
-	},
+	}
       ]
     },
     failure : {
@@ -163,27 +163,27 @@ CLOUDRONE.templates = {
 	{
 	  element : '#headerSelectDrone',
 	  method : 'hide'
-	},
+	}
       ]
     }
   },
   
   drone_show : {
     success : {
-      id : 'drone_show_success',
+      id : 'drone_show_success'
     },
     failure : {
       id : 'drone_show_failure',
-      alerts : ['Ошибка! Невозможно вывести список БИТС'],
+      alerts : ['Ошибка! Невозможно вывести список БИТС']
     }
   },
   
   drone_user_free : {
     success : {
-      id : 'drone_user_free_success',
+      id : 'drone_user_free_success'
     },
     failure : {
-      id : 'drone_user_free_failure',
+      id : 'drone_user_free_failure'
     }
   },
   
@@ -195,13 +195,18 @@ CLOUDRONE.templates = {
 	{
 	  element : '#bFlightTaskInput',
 	  method : 'removeAttr',
-	  params : ['disabled'],
+	  params : ['disabled']
 	},
+    {
+      element : '#bFlightTaskInput',
+      method : 'val',
+      params : ['']
+    },
 	{
 	  element : '#headerSelectDrone',
 	  method : 'hide'
-	},
-      ],
+	}
+      ]
     },
     failure : {
       id : 'drone_pick_failure',
@@ -210,9 +215,23 @@ CLOUDRONE.templates = {
       {
 	element : '#headerSelectDrone',
 	method : 'hide'
-      },
-      ],
+      }
+      ]
     }
+  },
+
+  task_given : {
+     success: {
+         id : 'task_given_success',
+         domElements: [{
+            element : '#bStart',
+            method : 'removeAttr',
+            params : ['disabled']
+         }]
+     },
+      failure: {
+          id : 'task_given_failure'
+      }
   },
   
   task_start : {
@@ -222,8 +241,8 @@ CLOUDRONE.templates = {
       {
 	element : '#headerSelectDrone',
 	method : 'hide'
-      },
-      ],
+      }
+      ]
     },
     failure : {
       id : 'task_start_failure',
@@ -232,8 +251,8 @@ CLOUDRONE.templates = {
       {
 	element : '#headerSelectDrone',
 	method : 'hide'
-      },
-      ],
+      }
+      ]
     }
   },
   
@@ -244,8 +263,8 @@ CLOUDRONE.templates = {
       {
 	element : '#headerSelectDrone',
 	method : 'hide'
-      },
-      ],
+      }
+      ]
     },
     failure : {
       id : 'task_stop_failure',
@@ -254,8 +273,8 @@ CLOUDRONE.templates = {
       {
 	element : '#headerSelectDrone',
 	method : 'hide'
-      },
-      ],
+      }
+      ]
     }
   },
   
@@ -266,8 +285,8 @@ CLOUDRONE.templates = {
       {
 	element : '#headerSelectDrone',
 	method : 'hide'
-      },
-      ],
+      }
+      ]
     },
     failure : {
       id : 'task_complete_failure',
@@ -276,7 +295,7 @@ CLOUDRONE.templates = {
       {
 	element : '#headerSelectDrone',
 	method : 'hide'
-      },
+      }
       ]
     }
   }

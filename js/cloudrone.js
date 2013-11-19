@@ -53,7 +53,7 @@ var CLOUDRONE = {
   doShowDrones : function() {
     WORKER_COMM.doShowDrones({
       policy : this.SHOWPOLICY[this.currentShowPolicy],
-      user : localStorage.id,
+      user : localStorage.id
     },
     this.templates.drone_show);
   },
@@ -64,7 +64,7 @@ var CLOUDRONE = {
 	id : id,
 	state : this.drones[id].state
       },
-      nstate : this.STATES['Free'],
+      nstate : this.STATES['Free']
     },
     this.templates.drone_user_free);
   },
@@ -118,25 +118,26 @@ var CLOUDRONE = {
     this.fetchMaps(id);
 
     switch(state) {
-      case this.STATES['TaskCompleted'] :
       case this.STATES['Free'] :
+      case this.STATES['Selected'] :
+      case this.STATES['TaskCompleted'] :
 	WORKER_COMM.doSetState({
 	  state : {
 	    id : id,
 	    state : this.drones[id].state
 	  },
-	  nstate : this.STATES['Selected'],
+	  nstate : this.STATES['Selected']
 	},
 	this.templates.drone_pick);
 	break;
-      case this.STATES['Selected'] :
+      case this.STATES['TaskGiven'] :
 	PAGE.showPage('FlightTask');
 	this.setButtons({
 	  toEnable : ['#bFlightTaskInput']
 	});
 	this.showDroneName();
-    this.setWriteState(this.WRITESTATES['WaitTask']);
 	break;
+
       case this.STATES['OnTask'] :
 	WORKER_COMM.initMonitoring(id);
 	this.showDroneName();
@@ -176,12 +177,12 @@ var CLOUDRONE = {
 	this.setButtons({
 	  toEnable : ['#bFlightTaskInput']
 	});
+    this.setWriteState(this.WRITESTATES['WaitTask']);
 	break;
       case this.STATES['TaskCompleted'] :
 	this.showResults(id);
 	break;
       case this.STATES['OnTask'] :
-	WORKER_COMM.initFlightCommands(id);
 	this.setWriteState(this.WRITESTATES['OnTask']);
 	break;
     };
@@ -247,10 +248,8 @@ var CLOUDRONE = {
 
   fetchMaps : function(id) {
      this.map_markers = [];
-     this.map_polyline = undefined;
      this.map.remove();
      this.clearMap();
-     $('#bFlightTaskInput').val('');
 
      $.ajax({
         url: '../tiles_/'+'qwe'+id+'/map.txt',             // указываем URL и
@@ -268,7 +267,7 @@ var CLOUDRONE = {
   },
 
   onClickStart : function() {
-    counter=0;
+    counter = 0;
     var pickedDrone = CLOUDRONE.pickedDrone;
     var drone = CLOUDRONE.drones[pickedDrone];
     var state = CLOUDRONE.getState(pickedDrone);
@@ -306,7 +305,7 @@ var CLOUDRONE = {
     };
 
     switch (state) {
-      case CLOUDRONE.STATES['Selected'] :
+      case CLOUDRONE.STATES['TaskGiven'] :
 	onSelected();
 	break;
       case CLOUDRONE.STATES['TaskCompleted'] :
@@ -334,7 +333,7 @@ var CLOUDRONE = {
 	  id : pickedDrone,
 	  state : state
 	},
-	nstate : CLOUDRONE.STATES['TaskCompleted'],
+	nstate : CLOUDRONE.STATES['TaskCompleted']
       },
       CLOUDRONE.templates.task_complete);
 
@@ -367,7 +366,7 @@ var CLOUDRONE = {
       return ((number < 10) ? '0' : '') + number;
     }
 
-    counter++;
+    counter ++;
 
     $('#elapsedTime').html( addLeadZero(hours) + ':'
 			  + addLeadZero(minutes) + ':'
@@ -445,67 +444,91 @@ var CLOUDRONE = {
    // $('#markersInfo').append(info);
   },
    
-    clearMap : function()
-    {
-      //for (var i = 0; i < CLOUDRONE.map._layers.length; i++)
-      //if (CLOUDRONE.map._layers[i]._path != undefined)
-      //   CLOUDRONE.map.removeLayer(CLOUDRONE.map._layers[i]);
-      for (var i = 0; i < CLOUDRONE.map_markers.length; i++)
-        CLOUDRONE.map.removeLayer(CLOUDRONE.map_markers[i]);
-      if (CLOUDRONE.map_polyline)
-        CLOUDRONE.map.removeLayer(CLOUDRONE.map_polyline);
-      CLOUDRONE.map_markers = [];
-      CLOUDRONE.map_polyline = undefined;
-    },
+  clearMap : function() {
 
+    for(var i in this.map._layers) {
+        if (this.map._layers[i]._path != undefined) {
+            try {
+                this.map.removeLayer(this.map._layers[i]);
+            }
+            catch(e) {
+                console.log("problem with " + e + this.map._layers[i]);
+            }
+        }
+    }
+    for (var i = 0; i < this.map_markers.length; i++) {
+        this.map.removeLayer(this.map_markers[i]);
+    }
+      /*
+    if (this.map_polyline) {
+        this.map.removeLayer(this.map_polyline);
+    }
+*/
+    this.map_markers = [];
+  },
+
+  addAndDrawMarkers : function(id, numbers) {
+    this.map_markers[id] = L.marker([numbers[1], numbers[0]]).addTo(this.map);
+  },
+
+  addAndDrawPolyline : function() {
+    var markers = [];
+    for (i in this.map_markers) {
+        markers.push(this.map_markers[i].getLatLng());
+    }
+    L.polyline(markers, {color: 'red'}).addTo(this.map);
+  },
+
+  setFlightTask : function(flightTask) {
+    if (flightTask) {
+        this.drones[this.pickedDrone].flightTask = flightTask;
+    }
+    var commands = this.drones[this.pickedDrone].flightTask.commands;
+
+    var patt = new RegExp(/^[ \t]*goto([ \t]*(\-)?(\d)*(\.)?(\d)*){4}[ \t]*$/);
+    var markerId = 0;
+
+    for(var id in commands) {
+        if (commands[id].match(patt)) {
+          var numbers = commands[id].trim().split(" ").slice(1);
+
+          if (this.map_info) {
+            for (var j = 0; j <= 1; j++) {
+                numbers[j] = (parseFloat(numbers[j]) + this.map_info.zero[j]) / this.map_info.size * 360.0;
+                while (numbers[j] < -180) numbers[j] += 360.;
+                while (numbers[j] > 180) numbers[j] -= 360.;
+            }
+
+            this.addAndDrawMarkers(markerId ++, numbers);
+          }
+        }
+
+    }
+
+    this.addAndDrawPolyline();
+    this.setButtons({
+      toEnable : ['#bStart']
+    });
+
+    this.setWriteState(CLOUDRONE.WRITESTATES['WaitLaunch']);
+  },
+
+  doSetFlightTask : function(xml) {
+    CLOUDRONE.drones[CLOUDRONE.pickedDrone].flightTask = {
+        commands : $(xml).find('flightPlan').text().split('\n').filter(
+            function(string){
+                return !string.match(new RegExp(/^[ \t]*$/));
+            })
+    };
+
+    WORKER_COMM.doSetFlightTask({
+            drone : CLOUDRONE.pickedDrone,
+            flightTask : CLOUDRONE.drones[CLOUDRONE.pickedDrone].flightTask
+        },
+        CLOUDRONE.templates.task_given);
+  },
 
   loadFlightTask : function(evt) {
-    var patt = new RegExp(/^[ \t]*goto([ \t]*(\-)?(\d)*(\.)?(\d)*){4}[ \t]*$/);
-
-    function sendCommands(flightPlan) {
-      
-      // mark start point
-      var markerId = 0;
-      if (CLOUDRONE.map_info)
-        CLOUDRONE.map_markers[markerId ++] = L.marker([CLOUDRONE.map_info.zero[1] / CLOUDRONE.map_info.size * 360.0, CLOUDRONE.map_info.zero[0] / CLOUDRONE.map_info.size * 360.0]).addTo(CLOUDRONE.map);
-
-      CLOUDRONE.drones[CLOUDRONE.pickedDrone].cmds = ["c start"];
-
-      if (flightPlan.length > 0) {
-	  var flightCmds = flightPlan.split('\n');
-
-	  for (var c = 0; c < flightCmds.length; c++) {
-	    if (!!flightCmds[c]) {
-
-	      if (flightCmds[c].match(patt)) { // if goto numbers
-		var numbers = flightCmds[c].trim().split(" ");
-
-		if (CLOUDRONE.map_info)
-		{
-		  for (var j = 1; j <= 2; j++) {
-		    numbers[j] = (parseFloat(numbers[j]) + CLOUDRONE.map_info.zero[j-1]) / CLOUDRONE.map_info.size * 360.0;
-		    while (numbers[j] < -180) numbers[j] += 360.;
-		    while (numbers[j] > 180) numbers[j] -= 360.;
-		  }
-		  CLOUDRONE.map_markers[markerId ++] = L.marker([numbers[2], numbers[1]]).addTo(CLOUDRONE.map);
-		//CLOUDRONE.maps.taskMap.markers[markerId ++] = L.marker([numbers[3]*CLOUDRONE.KOSTILEV, //numbers[4]*CLOUDRONE.KOSTILEV]).addTo(CLOUDRONE.maps.taskMap);
-		}
-	      }
-
-	      CLOUDRONE.drones[CLOUDRONE.pickedDrone].cmds.push("c " + flightCmds[c]);
-	    }
-	  }
-	}
-    }
-    
-    function drawPolyline() {
-      var markers = [];
-      for (i in CLOUDRONE.map_markers) {
-	markers.push(CLOUDRONE.map_markers[i].getLatLng());
-      }
-      CLOUDRONE.map_polyline = L.polyline(markers,{color: 'red'}).addTo(CLOUDRONE.map);
-    }
-
     var files = evt.target.files;
     for (var i = 0, f; f = files[i]; i++) {
 
@@ -514,18 +537,10 @@ var CLOUDRONE = {
 
       reader.onload = function(e) {
           CLOUDRONE.clearMap();
-	  var xml = e.target.result;
-	  sendCommands($(xml).find("flightPlan").text());
-	  drawPolyline();
-	  var objectList = $(xml).find("objectList").text();
+	      CLOUDRONE.doSetFlightTask(e.target.result);
       };
+
       reader.readAsBinaryString(f);
     }
-
-    CLOUDRONE.setButtons({
-      toEnable : ['#bStart'],
-    });
-
-    this.setWriteState(CLOUDRONE.WRITESTATES['WaitLaunch']);
   }
 }

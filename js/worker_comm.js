@@ -64,11 +64,26 @@ var WORKER_COMM = {
 	CLOUDRONE.showDrones(response);
 	break;
 	
-      case 'drone_pick_success' :
+        case 'drone_pick_success' :
 	CLOUDRONE.setState(response.state.id, response.state.state);
+    //set flight task from db, if no commands -> nothing to set
+    if (response.flightTask.commands.length != 0) {
+        CLOUDRONE.setFlightTask(response.flightTask);
+        CLOUDRONE.setState(response.state.id, CLOUDRONE.STATES['TaskGiven']);
+    } else {
+        CLOUDRONE.setButtons({
+            toDisable : ['#bStart']
+        });
+    }
 	CLOUDRONE.showDroneName();
 	break;
-	
+
+      case 'task_given_success' :
+    CLOUDRONE.setState(response.state.id, response.state.state);
+    //set flight task from xml-file
+    CLOUDRONE.setFlightTask();
+	break;
+
       case 'task_start_success' :
 	CLOUDRONE.setState(response.state.id, CLOUDRONE.STATES['WaitNavdata']); // first wait for navdata, then send commands
 	this.initMonitoring(CLOUDRONE.pickedDrone);
@@ -162,7 +177,23 @@ var WORKER_COMM = {
       responseSuccess : template.success,
       responseFailure : template.failure
     });
-  },
+ },
+
+ doSetFlightTask : function(input, template) {
+    this.initService({
+        serviceObject : {
+            ros : this.ros,
+            name : '/cloudrone/set_flight_task',
+            messageType: 'cloudrone/SetFlightTask'
+        },
+        requestObject : {
+            drone : input.drone,
+            flightTask : input.flightTask
+        },
+        responseSuccess: template.success,
+        responseFailure: template.failure
+    })
+ },
   
  doKillNodes : function(input, template) {
     this.initService({
@@ -178,29 +209,6 @@ var WORKER_COMM = {
       responseSuccess : template.success,
       responseFailure : template.failure
     })
-  },
-  
-  initFlightCommands : function(pickedDrone) {
-    
-    function initFlightCommand(cmd) {
-      WORKER_COMM.flightCmdPublisher.publish(
-	new ROSLIB.Message({
-	  data : cmd
-	})
-      );
-    };
-    
-    this.flightCmdPublisher = new ROSLIB.Topic({
-        ros : this.ros,
-        name : '/tum_ardrone/com',
-        messageType : 'std_msgs/String'
-    });
-    
-    cmds = CLOUDRONE.drones[pickedDrone].cmds;
-    
-    for (var i = 0; i < ((cmds) ? cmds.length : 0); i++) {
-      initFlightCommand(cmds[i]);
-    }
   },
   
   initMonitoring : function(pickedDrone) {
@@ -256,9 +264,11 @@ var WORKER_COMM = {
         height: video.height,
         topic: namespace + video.topic
     });
-    
-    if (this.stateWatcher)
-	this.stateWatcher.unsubscribe();
+
+    if (this.stateWatcher) {
+      this.stateWatcher.unsubscribe();
+    }
+
     this.stateWatcher = new ROSLIB.Topic({
       ros : this.ros,
       name : 'get_state',
@@ -271,6 +281,7 @@ var WORKER_COMM = {
   },
   
   monitoringCancel : function() {
+    CLOUDRONE.stopTheClocks(CLOUDRONE.clocks);
     WORKER_COMM.navdataListener.unsubscribe();
     WORKER_COMM.viewer = null;
   },
@@ -286,9 +297,5 @@ var WORKER_COMM = {
     this.markerListener.subscribe(function(markers) {
       CLOUDRONE.printMarkers(markers);
     });
-  },
-  
-  resultCancel : function() {
-    WORKER_COMM.markerListener.unsubcribe();
   }
 }
