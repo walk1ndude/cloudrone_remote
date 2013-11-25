@@ -184,6 +184,7 @@ var CLOUDRONE = {
 	break;
       case this.STATES['OnTask'] :
     this.clocks = CLOUDRONE.startTheClocks(this.timerClick, 1000);
+    this.drones[id].taskTime = new Date().getTime();
 	this.setWriteState(this.WRITESTATES['OnTask']);
 	break;
     };
@@ -280,8 +281,6 @@ var CLOUDRONE = {
 	toEnable : ['#bStop'],
 	toDisable : ['#bStart']
       });
-
-      drone.taskTime = new Date().getTime();
 
       CLOUDRONE.clearTheClocks('#elapsedTime');
       CLOUDRONE.setWriteState(CLOUDRONE.WRITESTATES['WaitNavdata']);
