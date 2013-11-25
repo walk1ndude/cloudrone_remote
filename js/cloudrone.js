@@ -183,6 +183,7 @@ var CLOUDRONE = {
 	this.showResults(id);
 	break;
       case this.STATES['OnTask'] :
+    this.clocks = CLOUDRONE.startTheClocks(this.timerClick, 1000);
 	this.setWriteState(this.WRITESTATES['OnTask']);
 	break;
     };
@@ -299,9 +300,6 @@ var CLOUDRONE = {
 	driver : drone.driver
       },
       CLOUDRONE.templates.task_start);
-
-      CLOUDRONE.clocks = CLOUDRONE.startTheClocks(CLOUDRONE.timerClick, 1000);
-
     };
 
     switch (state) {
